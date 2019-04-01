@@ -16,7 +16,7 @@ export default class App extends React.Component {
         return (
             <View style={styles.container}>
                 <Text>This is the input screen</Text>
-                <Text>Hello {this.props.userName}</Text>
+                <Text>Hello {this.props.names[0]}</Text>
                 <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={this.handlePress}>
                     <Text style={styles.btnText}>click</Text>
                 </TouchableHighlight>

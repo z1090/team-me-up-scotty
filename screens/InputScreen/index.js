@@ -1,8 +1,8 @@
 import { connect } from "react-redux";
 import InputScreen from "./InputScreen";
 
-const mapStateToProps = ({ userName }) => ({
-    userName,
+const mapStateToProps = ({ names }) => ({
+    names,
 });
 
 const mapDispatchToProps = (dispatch) => ({});
