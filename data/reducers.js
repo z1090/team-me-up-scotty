@@ -1,11 +1,15 @@
 import initialState from "./initialState";
 
+import { shuffle, splitIntoTeams } from "./LogicFunctions";
+
 const setInitial = () => initialState;
 
 const generateTeams = (state, action) => ({
     ...state,
-    names: action.names
-})
+    names: action.names,
+    teams: splitIntoTeams(shuffle(action.names))
+});
+
 
 
 
