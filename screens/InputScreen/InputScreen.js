@@ -25,6 +25,7 @@ export default class App extends React.Component {
     }
 
     handlePress() {
+        this.props.onGenerateTeams(this.state);
         this.props.navigation.navigate("Teams");
     }
 
@@ -34,8 +35,6 @@ export default class App extends React.Component {
     
 
     render() {
-        console.log(this.state.names);
-
         return (
             <View style={styles.container}>
                 <Text>Enter Participants</Text>
@@ -65,7 +64,7 @@ export default class App extends React.Component {
 
 
                 <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={this.handlePress}>
-                    <Text style={styles.btnText}>click</Text>
+                    <Text style={styles.btnText}>Generate Teams</Text>
                 </TouchableHighlight>
             </View>
         );
