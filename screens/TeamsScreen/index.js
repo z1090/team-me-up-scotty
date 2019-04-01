@@ -1,7 +1,9 @@
 import { connect } from "react-redux";
 import TeamsScreen from "./TeamsScreen";
 
-const mapStateToProps = ({}) => ({});
+const mapStateToProps = ({teams}) => ({
+    teams,
+});
 
 const mapDispatchToProps = (dispatch) => ({});
 
