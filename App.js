@@ -1,21 +1,38 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { StatusBar } from "react-native";
+import { createStackNavigator, createAppContainer } from "react-navigation";
+import { Provider } from "react-redux";
+
+import InputScreen from "./screens/InputScreen";
+import TeamsScreen from "./screens/TeamsScreen";
+
+import store from "./data/store";
+
+StatusBar.setBarStyle("light-content");
+
+const rootNav = createStackNavigator(
+    {
+        Input: InputScreen,
+        Teams: TeamsScreen,
+    },
+    {
+        defaultNavigationOptions: {
+            headerStyle: {
+                backgroundColor: "#4F9F4F",
+            },
+            headerTintColor: "#FFF",
+        },
+    }
+);
+
+const Navigation = createAppContainer(rootNav);
 
 export default class App extends React.Component {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-      </View>
-    );
-  }
+    render() {
+        return (
+            <Provider store={store}>
+                <Navigation />
+            </Provider>
+        );
+    }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
