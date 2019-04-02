@@ -1,15 +1,15 @@
 import { connect } from "react-redux";
 
 import InputScreen from "./InputScreen";
-import {generateTeams} from "../../data/stateActions";
-
+import { generateTeams, resetInputs } from "../../data/stateActions";
 
 const mapStateToProps = ({ names }) => ({
     names,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    onGenerateTeams: data => dispatch(generateTeams(data))
+    onGenerateTeams: (data) => dispatch(generateTeams(data)),
+    onResetInputs: () => dispatch(resetInputs()),
 });
 
 export default connect(

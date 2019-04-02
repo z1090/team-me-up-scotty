@@ -9,10 +9,13 @@ import {
     Dimensions,
     ImageBackground,
     SafeAreaView,
+    TouchableOpacity,
+    Alert,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { BoldText, RegText } from "../../components/typefaces/Montserrat.js";
 import { isIphoneX } from "../../data/isIphoneX";
+import { FontAwesome as Icon } from "@expo/vector-icons";
 
 const HEADER_SIZE = isIphoneX() ? 100 : 60;
 
@@ -28,16 +31,46 @@ export default class App extends React.Component {
             names: this.props.names,
         };
         this.handlePress = this.handlePress.bind(this);
+        this._resetAlertHandler = this._resetAlertHandler.bind(this);
+        this._resetInputs = this._resetInputs.bind(this);
         // this.handleInputChange = this.handleInputChange.bind(this);
     }
 
-    static navigationOptions = {
+    static navigationOptions = ({ navigation }) => ({
         title: "Participants",
-    };
+        headerRight: (
+            <TouchableOpacity title="reset" color="#fff" onPress={navigation.getParam("_resetAlertHandler")}>
+                <Icon style={styles.icon} name="close" size={24} color="#FFF" />
+            </TouchableOpacity>
+        ),
+    });
+
+    componentDidMount() {
+        this.props.navigation.setParams({ _resetAlertHandler: this._resetAlertHandler });
+    }
+
+    _resetAlertHandler() {
+        Alert.alert(
+            "Reset Participants?",
+            "",
+            [
+                { text: "Cancel", onPress: () => console.log("Canceled"), style: "cancel" },
+                { text: "OK", onPress: () => this._resetInputs() },
+            ],
+            { cancelable: false }
+        );
+    }
+
+    async _resetInputs() {
+        await this.props.onResetInputs();
+        this.setState({ names: this.props.names });
+    }
 
     handlePress() {
-        this.props.onGenerateTeams(this.state);
-        this.props.navigation.navigate("Teams");
+        if (this.state.names[0] !== "") {
+            this.props.onGenerateTeams(this.state);
+            this.props.navigation.navigate("Teams");
+        }
     }
 
     // handleInputChange(text) {
@@ -235,5 +268,8 @@ const styles = StyleSheet.create({
     background: {
         width: "100%",
         flex: 1,
+    },
+    icon: {
+        marginRight: 16,
     },
 });
