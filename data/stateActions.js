@@ -21,3 +21,10 @@ export const regenerateTeams = () => {
         type: "regenerateTeams",
     };
 };
+
+export const loadFromStorage = (names) => {
+    return {
+        type: "loadFromStorage",
+        names,
+    };
+};

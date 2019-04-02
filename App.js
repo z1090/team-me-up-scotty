@@ -1,16 +1,34 @@
 import React from "react";
-import { StatusBar } from "react-native";
+import { StatusBar, AsyncStorage } from "react-native";
 import { createStackNavigator, createAppContainer } from "react-navigation";
 import { Provider } from "react-redux";
 import { AppLoading } from "expo";
+
 import cacheAssetsAsync from "./utilities/cacheAssetsAsync";
 
+StatusBar.setBarStyle("light-content");
+
+
+//================================================================
+// Store Initial Setup ===========================================
+import { createStore, compose, applyMiddleware } from "redux";
+import thunk from "redux-thunk";
+
+import initialState from "./data/initialState";
+import reducer from "./data/reducers";
+
+const reduxDevTools = (window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__) || compose;
+
+const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+
+const store = createStoreWithMiddleware(reducer, initialState, reduxDevTools());
+//================================================================
+
+
+//================================================================
+// Navigation Setup ==============================================
 import InputScreen from "./screens/InputScreen";
 import TeamsScreen from "./screens/TeamsScreen";
-
-import store from "./data/store";
-
-StatusBar.setBarStyle("light-content");
 
 const rootNav = createStackNavigator(
     {
@@ -19,7 +37,6 @@ const rootNav = createStackNavigator(
     },
     {
         headerLayoutPreset: "center",
-
         defaultNavigationOptions: {
             headerTitleStyle: {
                 fontFamily: "montserrat-bold",
@@ -37,14 +54,25 @@ const rootNav = createStackNavigator(
 
 const Navigation = createAppContainer(rootNav);
 
+//================================================================
+
 export default class App extends React.Component {
     state = {
         appIsReady: false,
+        storeInState: store,
     };
 
     componentWillMount() {
+        AsyncStorage.multiGet(["names"], (e, results) => {
+            if (results[0][1] !== null) {
+                const loadedState = { names: JSON.parse(results[0][1])}
+                const loadedStore = createStoreWithMiddleware(reducer, loadedState, reduxDevTools());
+                this.setState({storeInState: loadedStore})
+            }
+        });
         this._loadAssetsAsync();
     }
+
 
     async _loadAssetsAsync() {
         try {
@@ -69,7 +97,7 @@ export default class App extends React.Component {
     render() {
         if (this.state.appIsReady) {
             return (
-                <Provider store={store}>
+                <Provider store={this.state.storeInState}>
                     <Navigation />
                 </Provider>
             );

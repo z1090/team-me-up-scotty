@@ -1,4 +1,4 @@
-const initialState = {
+let initialState = {
     names: [
         "01 - Jordan Pickford",
         "02 - Danny Rose",
