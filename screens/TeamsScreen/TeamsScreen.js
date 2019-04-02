@@ -1,5 +1,6 @@
 import React from "react";
-import { StyleSheet, Text, View, ImageBackground } from "react-native";
+import { StyleSheet, Text, View, ImageBackground, TouchableOpacity } from "react-native";
+import { FontAwesome as Icon } from "@expo/vector-icons";
 
 import { BoldText, RegText } from "../../components/typefaces/Montserrat.js";
 import { isIphoneX } from "../../data/isIphoneX";
@@ -9,9 +10,28 @@ const HEADER_SIZE = isIphoneX() ? 100 : 60;
 import BackgroundImg from "../../assets/teams-background.jpg";
 
 export default class App extends React.Component {
-    static navigationOptions = {
+    static navigationOptions = ({ navigation }) => ({
         title: "Teams",
-    };
+        headerRight: (
+            <TouchableOpacity title="reset" color="#fff" onPress={navigation.getParam("_regenerateTeams")}>
+                <Icon style={styles.icon} name="refresh" size={24} color="#FFF" />
+            </TouchableOpacity>
+        ),
+    });
+
+    constructor(props) {
+        super(props);
+
+        this._regenerateTeams = this._regenerateTeams.bind(this);
+    }
+
+    _regenerateTeams() {
+        this.props.regenerateTeams();
+    }
+
+    componentDidMount() {
+        this.props.navigation.setParams({ _regenerateTeams: this._regenerateTeams });
+    }
     render() {
         return (
             <ImageBackground source={BackgroundImg} style={styles.background}>
@@ -62,5 +82,8 @@ const styles = StyleSheet.create({
     heading: {
         fontSize: 26,
         marginBottom: 8,
+    },
+    icon: {
+        marginRight: 16,
     },
 });
