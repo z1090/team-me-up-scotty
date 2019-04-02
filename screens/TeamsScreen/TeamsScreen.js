@@ -1,23 +1,40 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, ImageBackground } from "react-native";
+
+import { BoldText, RegText } from "../../components/typefaces/Montserrat.js";
+import { isIphoneX } from "../../data/isIphoneX";
+
+const HEADER_SIZE = isIphoneX() ? 100 : 60;
+
+import BackgroundImg from "../../assets/teams-background.jpg";
 
 export default class App extends React.Component {
+    static navigationOptions = {
+        title: "Teams",
+    };
     render() {
         return (
-            <View style={styles.container}>
-                <Text>Team 1</Text>
-                <Text>1 - {this.props.teams.team1[0]}</Text>
-                <Text>2 - {this.props.teams.team1[1]}</Text>
-                <Text>3 - {this.props.teams.team1[2]}</Text>
-                <Text>4 - {this.props.teams.team1[3]}</Text>
-                <Text>5 - {this.props.teams.team1[4]}</Text>
-                <Text>Team 2</Text>
-                <Text>1 - {this.props.teams.team2[0]}</Text>
-                <Text>2 - {this.props.teams.team2[1]}</Text>
-                <Text>3 - {this.props.teams.team2[2]}</Text>
-                <Text>4 - {this.props.teams.team2[3]}</Text>
-                <Text>5 - {this.props.teams.team2[4]}</Text>
-            </View>
+            <ImageBackground source={BackgroundImg} style={styles.background}>
+                <View style={styles.container}>
+                    <View style={styles.innerContainer}>
+                        <BoldText style={styles.heading}>Team 1</BoldText>
+                        <RegText>1 - {this.props.teams.team1[0]}</RegText>
+                        <RegText>2 - {this.props.teams.team1[1]}</RegText>
+                        <RegText>3 - {this.props.teams.team1[2]}</RegText>
+                        <RegText>4 - {this.props.teams.team1[3]}</RegText>
+                        <RegText>5 - {this.props.teams.team1[4]}</RegText>
+                    </View>
+                    <View style={styles.innerContainer}>
+                        <BoldText style={styles.heading}>Team 2</BoldText>
+                        <RegText>1 - {this.props.teams.team2[0]}</RegText>
+                        <RegText>2 - {this.props.teams.team2[1]}</RegText>
+                        <RegText>3 - {this.props.teams.team2[2]}</RegText>
+                        <RegText>4 - {this.props.teams.team2[3]}</RegText>
+                        <RegText>5 - {this.props.teams.team2[4]}</RegText>
+                    </View>
+                    <View style={styles.innerContainer} />
+                </View>
+            </ImageBackground>
         );
     }
 }
@@ -25,8 +42,25 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        width: "100%",
         alignItems: "center",
         justifyContent: "center",
+        marginTop: HEADER_SIZE,
+    },
+    innerContainer: {
+        flex: 1,
+        width: "80%",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        marginVertical: 20,
+        // backgroundColor: "blue",
+    },
+    background: {
+        width: "100%",
+        flex: 1,
+    },
+    heading: {
+        fontSize: 26,
+        marginBottom: 8,
     },
 });
