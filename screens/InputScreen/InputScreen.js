@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     Alert,
     AsyncStorage,
+    FlatList,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { BoldText, RegText } from "../../components/typefaces/Montserrat.js";
@@ -30,11 +31,13 @@ export default class App extends React.Component {
 
         this.state = {
             names: this.props.names,
+            loading: false,
         };
         this.handlePress = this.handlePress.bind(this);
         this._resetAlertHandler = this._resetAlertHandler.bind(this);
         this._resetInputs = this._resetInputs.bind(this);
-        // this.handleInputChange = this.handleInputChange.bind(this);
+        this.renderItem = this.renderItem.bind(this);
+        this.refreshData = this.refreshData.bind(this);
     }
 
     static navigationOptions = ({ navigation }) => ({
@@ -78,11 +81,31 @@ export default class App extends React.Component {
         }
     }
 
-    // handleInputChange(text) {
-    //     this.setState({ names: this.state.names.map((player, i) => (player = i === 0 ? text : player))};
-    // }
+
+    renderItem({ item, index }) {
+        let newNames = [...this.state.names]
+        return (<TextInput
+            style={styles.textInput}
+            value={item}
+            onChange={(e) => {
+                newNames[index] = e.nativeEvent.text;
+                console.log(newNames);
+                this.setState({ names: newNames })
+            }}
+        />)
+    }
+
+    keyExtractor(item, index) {
+        return `${index}`;
+    }
+    refreshData() {
+        this.setState({ loading: true });
+        this.setState({ names: this.props.names, loading: false });
+
+    }
 
     render() {
+        const { names, loading } = this.state;
         return (
             <ImageBackground source={BackgroundImg} style={styles.background}>
                 <SafeAreaView style={styles.container}>
@@ -94,116 +117,13 @@ export default class App extends React.Component {
                             keyboardShouldPersistTaps="handled"
                         >
                             <View style={styles.inputContainer}>
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[0]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 0 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[1]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 1 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[2]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 2 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[3]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 3 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[4]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 4 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[5]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 5 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[6]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 6 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[7]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 7 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[8]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 8 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[9]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 9 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
+                            <FlatList
+                                data={names}
+                                renderItem={this.renderItem}
+                                keyExtractor={this.keyExtractor}
+                                onRefresh={this.refreshData}
+                                refreshing={loading}
+                            />
                             </View>
                         </KeyboardAwareScrollView>
                     </View>
@@ -227,7 +147,7 @@ const styles = StyleSheet.create({
         marginTop: HEADER_SIZE,
     },
     InnerContainer: {
-        flex: 2,
+        flex: 3,
         alignItems: "center",
         justifyContent: "flex-start",
     },
