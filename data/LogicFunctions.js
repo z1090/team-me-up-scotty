@@ -5,7 +5,7 @@ export const shuffle = (array) => {
     let tempValue;
 
     while (length > 0) {
-        randomIndex = Math.round(Math.random() * length);
+        randomIndex = Math.floor(Math.random() * length);
         length -= 1;
         tempValue = newArr[length];
         newArr[length] = newArr[randomIndex];
