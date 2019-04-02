@@ -11,6 +11,7 @@ import {
     SafeAreaView,
     TouchableOpacity,
     Alert,
+    AsyncStorage,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { BoldText, RegText } from "../../components/typefaces/Montserrat.js";
@@ -69,6 +70,10 @@ export default class App extends React.Component {
     handlePress() {
         if (this.state.names[0] !== "") {
             this.props.onGenerateTeams(this.state);
+            let namesStr = JSON.stringify(this.state.names);
+            AsyncStorage.multiSet([["names", namesStr]], () => {
+                console.log("Values stored");
+            });
             this.props.navigation.navigate("Teams");
         }
     }

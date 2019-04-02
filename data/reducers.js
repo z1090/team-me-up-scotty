@@ -1,3 +1,4 @@
+import { AsyncStorage } from "react-native";
 import initialState from "./initialState";
 
 import { shuffle, splitIntoTeams } from "./LogicFunctions";
@@ -20,6 +21,11 @@ const resetInputs = (state) => ({
     names: ["", "", "", "", "", "", "", "", "", ""],
 });
 
+const loadFromStorage = (state, action) => ({
+    ...state,
+    names: action.names,
+});
+
 const reducer = (state, action) => {
     switch (action.type) {
         case "reset":
@@ -30,6 +36,8 @@ const reducer = (state, action) => {
             return resetInputs(state);
         case "regenerateTeams":
             return regenerateTeams(state);
+        case "loadFromStorage":
+            return loadFromStorage(state, action);
         default:
             return state;
     }
