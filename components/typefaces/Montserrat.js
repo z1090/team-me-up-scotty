@@ -16,6 +16,8 @@ const styles = StyleSheet.create({
     bold: {
         fontFamily: "montserrat-bold",
         color: "#FFF",
+        fontSize: 16,
+        lineHeight: 26,
     },
     regular: {
         fontFamily: "montserrat-regular",

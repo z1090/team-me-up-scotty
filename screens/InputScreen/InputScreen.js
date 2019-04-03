@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     Alert,
     AsyncStorage,
+    FlatList,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { BoldText, RegText } from "../../components/typefaces/Montserrat.js";
@@ -30,18 +31,22 @@ export default class App extends React.Component {
 
         this.state = {
             names: this.props.names,
+            loading: false,
         };
         this.handlePress = this.handlePress.bind(this);
         this._resetAlertHandler = this._resetAlertHandler.bind(this);
         this._resetInputs = this._resetInputs.bind(this);
-        // this.handleInputChange = this.handleInputChange.bind(this);
+        this.renderItem = this.renderItem.bind(this);
+        this.refreshData = this.refreshData.bind(this);
+        this.addParticipant = this.addParticipant.bind(this);
+        this.deleteParticipant = this.deleteParticipant.bind(this);
     }
 
     static navigationOptions = ({ navigation }) => ({
         title: "Participants",
         headerRight: (
             <TouchableOpacity title="reset" color="#fff" onPress={navigation.getParam("_resetAlertHandler")}>
-                <Icon style={styles.icon} name="close" size={24} color="#FFF" />
+                <Icon style={styles.icon} name="undo" size={24} color="#FFF" />
             </TouchableOpacity>
         ),
     });
@@ -67,8 +72,25 @@ export default class App extends React.Component {
         this.setState({ names: this.props.names });
     }
 
+    async addParticipant() {
+        await this.setState({ names: this.state.names.concat("") });
+        this.inputIndex.focus();
+    }
+
+    deleteParticipant(index) {
+        console.log(index);
+        let newState = this.state.names.reduce((acc, val, i) => {
+            if (i !== index) {
+                acc.push(val);
+            }
+            return acc;
+        }, [])
+        console.log(newState);
+        this.setState({ names: newState });
+    }
+
     handlePress() {
-        if (this.state.names[0] !== "") {
+        if (this.state.names.length >= 3 && this.state.names[0] !== "" && this.state.names[1] !== "" && this.state.names[2] !== "") {
             this.props.onGenerateTeams(this.state);
             let namesStr = JSON.stringify(this.state.names);
             AsyncStorage.multiSet([["names", namesStr]], () => {
@@ -78,11 +100,47 @@ export default class App extends React.Component {
         }
     }
 
-    // handleInputChange(text) {
-    //     this.setState({ names: this.state.names.map((player, i) => (player = i === 0 ? text : player))};
-    // }
+
+    renderItem({ item, index }) {
+        let newNames = [...this.state.names]
+        let playerNum = String(index + 1).padStart(2, "0");
+
+        return (
+            <View style={styles.inputRow}>
+                <View style={styles.rowNumberContainer}>
+                    <Text style={styles.rowNumber}>{playerNum}</Text>
+                </View>
+                <TextInput
+                    ref={(input) => { this.inputIndex = input; }}
+                    style={styles.textInput}
+                    maxLength={30}
+                    value={item}
+                    onChange={(e) => {
+                        newNames[index] = e.nativeEvent.text;
+                        console.log(newNames);
+                        this.setState({ names: newNames })
+                    }}
+                />
+                <TouchableOpacity style={styles.rowDelete} title="plus" color="#fff" onPress={() => {
+                    console.log(index);
+                    this.deleteParticipant(index)}
+                } >
+                    <Icon style={styles.deleteIcon} name="close" size={16} color="#FFF" />
+                </TouchableOpacity>
+            </View>
+        )
+    }
+
+    keyExtractor(item, index) {
+        return `${index}`;
+    }
+    refreshData() {
+        this.setState({ loading: true });
+        this.setState({ names: this.props.names, loading: false });
+    }
 
     render() {
+        const { names, loading } = this.state;
         return (
             <ImageBackground source={BackgroundImg} style={styles.background}>
                 <SafeAreaView style={styles.container}>
@@ -94,116 +152,18 @@ export default class App extends React.Component {
                             keyboardShouldPersistTaps="handled"
                         >
                             <View style={styles.inputContainer}>
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[0]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 0 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[1]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 1 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[2]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 2 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[3]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 3 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[4]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 4 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[5]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 5 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[6]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 6 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[7]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 7 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[8]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 8 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
-                                <TextInput
-                                    style={styles.textInput}
-                                    value={this.state.names[9]}
-                                    onChangeText={(text) =>
-                                        this.setState({
-                                            names: this.state.names.map(
-                                                (player, i) => (player = i === 9 ? text : player)
-                                            ),
-                                        })
-                                    }
-                                />
+                            <FlatList
+                                data={names}
+                                renderItem={this.renderItem}
+                                keyExtractor={this.keyExtractor}
+                                onRefresh={this.refreshData}
+                                refreshing={loading}
+                            />
+                            </View>
+                            <View style={styles.addBtnContainer}>
+                                <TouchableOpacity title="plus" color="#fff" onPress={this.addParticipant}>
+                                    <Icon style={styles.icon} name="plus" size={30} color="#FFF" />
+                                </TouchableOpacity>
                             </View>
                         </KeyboardAwareScrollView>
                     </View>
@@ -227,7 +187,7 @@ const styles = StyleSheet.create({
         marginTop: HEADER_SIZE,
     },
     InnerContainer: {
-        flex: 2,
+        flex: 3,
         alignItems: "center",
         justifyContent: "flex-start",
     },
@@ -235,25 +195,76 @@ const styles = StyleSheet.create({
         width: win.width,
         alignItems: "center",
         marginTop: 30,
+        paddingBottom: 50,
         // backgroundColor: "blue",
     },
     inputContainer: {
         width: "80%",
     },
-    textInput: {
+    addBtnContainer: {
+        alignItems: "center",
+        justifyContent: "flex-start",
+        width: "100%",
+        marginTop: 20,
+    },
+    inputRow: {
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+    },
+    rowDelete: {
+        justifyContent: "center",
+        alignItems: "center",
+        borderColor: "#69B569",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderRightWidth: 1,
+        borderTopRightRadius: 5,
+        borderBottomRightRadius: 5,
+        height: 35,
+        width: 30,
+        marginBottom: 8,
+        paddingTop: 0,
+        // paddingLeft: 15,
+        color: "#FFF",
+        backgroundColor: "rgba(255, 255, 255, 0.1)",
+    },
+    rowNumberContainer: {
+        justifyContent: "center",
         borderColor: "#69B569",
         borderWidth: 1,
-        borderRadius: 5,
+        borderRightWidth: 0,
+        borderTopLeftRadius: 5,
+        borderBottomLeftRadius: 5,
         height: 35,
-        width: "100%",
+        width: 37,
         marginBottom: 8,
-        paddingHorizontal: 5,
+        paddingTop: 7,
+        paddingLeft: 5,
+    },
+    rowNumber: {
+        justifyContent: "center",
+        marginBottom: 8,
+        paddingLeft: 5,
+        fontFamily: "montserrat-bold",
+        color: "#FFF",
+    },
+    textInput: {
+        flex: 1,
+        borderColor: "#69B569",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        height: 35,
+        // width: "100%",
+        marginBottom: 8,
+        paddingRight: 8,
         fontFamily: "montserrat-regular",
         color: "#FFF",
     },
     btnContainer: {
         flex: 1,
-        // backgroundColor: "yellow",
+        // backgroundColor: "rgba(0, 0, 0, 0.1)",
+        width: "100%",
         alignItems: "center",
         justifyContent: "center",
     },

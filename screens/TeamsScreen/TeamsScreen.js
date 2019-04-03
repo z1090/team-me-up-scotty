@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View, ImageBackground, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, FlatList } from "react-native";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 
 import { BoldText, RegText } from "../../components/typefaces/Montserrat.js";
@@ -22,6 +22,10 @@ export default class App extends React.Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            loading: false,
+        };
+        this.renderItem = this.renderItem.bind(this);
         this._regenerateTeams = this._regenerateTeams.bind(this);
     }
 
@@ -32,25 +36,47 @@ export default class App extends React.Component {
     componentDidMount() {
         this.props.navigation.setParams({ _regenerateTeams: this._regenerateTeams });
     }
+
+    renderItem({ item, index }) {
+        let playerNum = index + 1;
+        return (
+            <View style={styles.playerRow}>
+                <View style={{width: 30}}>
+                    <BoldText>{playerNum}</BoldText>
+                </View>
+                <RegText>{item}</RegText>
+            </View>
+            )
+    }
+
+    keyExtractor(item, index) {
+        return `${index}`;
+    }
+    refreshData() {
+        this.setState({ loading: true });
+        this.setState({ names: this.props.names, loading: false });
+
+    }
+
     render() {
         return (
             <ImageBackground source={BackgroundImg} style={styles.background}>
                 <View style={styles.container}>
                     <View style={styles.innerContainer}>
                         <BoldText style={styles.heading}>Team 1</BoldText>
-                        <RegText>1 - {this.props.teams.team1[0]}</RegText>
-                        <RegText>2 - {this.props.teams.team1[1]}</RegText>
-                        <RegText>3 - {this.props.teams.team1[2]}</RegText>
-                        <RegText>4 - {this.props.teams.team1[3]}</RegText>
-                        <RegText>5 - {this.props.teams.team1[4]}</RegText>
+                        <FlatList
+                                data={this.props.teams.team1}
+                                renderItem={this.renderItem}
+                                keyExtractor={this.keyExtractor}
+                        />
                     </View>
                     <View style={styles.innerContainer}>
                         <BoldText style={styles.heading}>Team 2</BoldText>
-                        <RegText>1 - {this.props.teams.team2[0]}</RegText>
-                        <RegText>2 - {this.props.teams.team2[1]}</RegText>
-                        <RegText>3 - {this.props.teams.team2[2]}</RegText>
-                        <RegText>4 - {this.props.teams.team2[3]}</RegText>
-                        <RegText>5 - {this.props.teams.team2[4]}</RegText>
+                        <FlatList
+                                data={this.props.teams.team2}
+                                renderItem={this.renderItem}
+                                keyExtractor={this.keyExtractor}
+                        />
                     </View>
                     <View style={styles.innerContainer} />
                 </View>
@@ -86,4 +112,9 @@ const styles = StyleSheet.create({
     icon: {
         marginRight: 16,
     },
+    playerRow: {
+        flexDirection: "row",
+        // alignItems: "flex-start",
+        justifyContent: "flex-start",
+    }
 });

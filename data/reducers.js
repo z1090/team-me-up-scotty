@@ -18,7 +18,7 @@ const regenerateTeams = (state) => ({
 
 const resetInputs = (state) => ({
     ...state,
-    names: ["", "", "", "", "", "", "", "", "", ""],
+    names: [""],
 });
 
 const loadFromStorage = (state, action) => ({
