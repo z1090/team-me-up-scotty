@@ -80,7 +80,7 @@ export default class App extends React.Component {
     componentWillMount() {
         AsyncStorage.multiGet(["names"], (e, results) => {
             if (results[0][1] !== null) {
-                const loadedState = { names: JSON.parse(results[0][1]), numberOfTeams: 3 };
+                const loadedState = { names: JSON.parse(results[0][1]), numberOfTeams: 3, teams: [] };
                 const loadedStore = createStoreWithMiddleware(reducer, loadedState, reduxDevTools());
                 this.setState({ storeInState: loadedStore });
             }

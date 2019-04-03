@@ -4,15 +4,16 @@ import { shuffle, splitIntoTeams } from "./LogicFunctions";
 
 const setInitial = () => initialState;
 
-const generateTeams = (state, action) => ({
+const generateTeams = (state, action) => {
+    return ({
     ...state,
     names: action.names,
-    teams: splitIntoTeams(shuffle(action.names), state.numberOfTeams),
-});
+    teams: splitIntoTeams(shuffle(action.names), state.numberOfTeams, state.teams),
+})};
 
 const regenerateTeams = (state) => ({
     ...state,
-    teams: splitIntoTeams(shuffle(state.names), state.numberOfTeams),
+    teams: splitIntoTeams(shuffle(state.names), state.numberOfTeams, state.teams),
 });
 
 const resetInputs = (state) => ({
@@ -23,6 +24,11 @@ const resetInputs = (state) => ({
 const loadFromStorage = (state, action) => ({
     ...state,
     names: action.names,
+});
+
+const saveTeamName = (state, action) => ({
+    ...state,
+    teams: action.teams,
 });
 
 const reducer = (state, action) => {
@@ -37,6 +43,8 @@ const reducer = (state, action) => {
             return regenerateTeams(state);
         case "loadFromStorage":
             return loadFromStorage(state, action);
+        case "saveTeamName":
+            return saveTeamName(state, action);
         default:
             return state;
     }

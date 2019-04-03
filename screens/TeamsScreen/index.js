@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import TeamsScreen from "./TeamsScreen";
-import { regenerateTeams } from "../../data/stateActions";
+import { regenerateTeams, saveTeamName } from "../../data/stateActions";
 
 const mapStateToProps = ({ teams }) => ({
     teams,
@@ -8,6 +8,7 @@ const mapStateToProps = ({ teams }) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     regenerateTeams: () => dispatch(regenerateTeams()),
+    saveTeamName: (data) => dispatch(saveTeamName(data)),
 });
 
 export default connect(

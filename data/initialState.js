@@ -3,6 +3,7 @@ let initialState = {
         "",
     ],
     numberOfTeams: 3,
+    teams: [],
 };
 
 export default initialState;

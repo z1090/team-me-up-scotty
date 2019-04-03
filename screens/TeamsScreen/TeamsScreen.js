@@ -36,17 +36,21 @@ export default class App extends React.Component {
         };
         this.renderPlayers = this.renderPlayers.bind(this);
         this.renderTeams = this.renderTeams.bind(this);
+        this.closeModal = this.closeModal.bind(this);
+        this.setModalVisible = this.setModalVisible.bind(this);
     }
+
 
     componentDidMount() {
         this.props.navigation.setParams({
-            _regenerateTeams: () => {
-                this.props.regenerateTeams(this.state);
+            _regenerateTeams: async () => {
+                await this.props.regenerateTeams(this.state);
+                this.setState({teams: this.props.teams});
+
             },
         });
     }
     async editTeamName(event, i){
-        console.log(i);
         this.setState({currentTeam: i});
         await this.setModalVisible(true);
         this.inputIndex.focus();
@@ -56,6 +60,11 @@ export default class App extends React.Component {
     setModalVisible = (visible) => {
         this.setState({modalVisible: visible});
       }
+
+    closeModal() {
+        this.props.saveTeamName(this.state);
+        this.setModalVisible(false);
+    }
 
     renderTeams({ item, index }) {
         return (
@@ -109,27 +118,33 @@ export default class App extends React.Component {
                 >
                     <View style={styles.modalOuterContainer}>
                         <View style={styles.modalContainer}>
-                        <BoldText style={{color: "#333"}}>Enter Team Name</BoldText>
-                        <TextInput
-                            style={styles.textInput}
-                            ref={(input) => { this.inputIndex = input; }}
-                            value={teams[currentTeam].teamName}
-                            onChange={(e) => {
-                                editedTeams[currentTeam].teamName = e.nativeEvent.text;
-                                this.setState({ teams: editedTeams })
-                            }}
-                        />
-                        <View style={styles.btnRow}>
-                        <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={()=> {
-                            editedTeams[currentTeam].teamName = generateTeamName();
-                            this.setState({ teams: editedTeams })
-                        }}>
-                            <Text style={styles.btnText}>Random</Text>
-                        </TouchableHighlight>
-                        <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={this.setModalVisible.bind(this, false)}><Text style={styles.btnText}>Close</Text></TouchableHighlight>
-                        
-                        </View>
-                        
+                            <BoldText style={{color: "#333"}}>Enter Team Name</BoldText>
+                            <TextInput
+                                style={styles.textInput}
+                                ref={(input) => { this.inputIndex = input; }}
+                                value={teams[currentTeam].teamName}
+                                onChange={(e) => {
+                                    editedTeams[currentTeam].teamName = e.nativeEvent.text;
+                                    this.setState({ teams: editedTeams })
+                                }}
+                            />
+                            <View style={styles.btnRow}>
+                                <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={()=> {
+                                    editedTeams[currentTeam].teamName = `Team ${currentTeam + 1}`;
+                                    this.setState({ teams: editedTeams })
+                                }}>
+                                    <Text style={styles.btnText}>Reset</Text>
+                                </TouchableHighlight>
+                                <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={()=> {
+                                    editedTeams[currentTeam].teamName = generateTeamName();
+                                    this.setState({ teams: editedTeams })
+                                }}>
+                                    <Text style={styles.btnText}>Random</Text>
+                                </TouchableHighlight>
+                                <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={this.closeModal}>
+                                    <Text style={styles.btnText}>Close</Text>
+                                </TouchableHighlight>
+                            </View>
                         </View>
                     </View>
                 </Modal>
@@ -227,7 +242,7 @@ const styles = StyleSheet.create({
     btnRow: {
         marginTop: 5,
         flexDirection: "row",
-        justifyContent: "flex-end"
+        justifyContent: "center"
     },
     btn: {
         alignItems: "center",
@@ -236,11 +251,11 @@ const styles = StyleSheet.create({
         height: 30,
         borderRadius: 8,
         backgroundColor: "#388E3C",
-        marginLeft: 10,
+        marginHorizontal: 5,
     },
     btnText: {
+        fontFamily: "montserrat-bold",
         fontSize: 14,
-        fontWeight: "bold",
         color: "#FFF",
     },
 });

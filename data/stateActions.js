@@ -27,3 +27,10 @@ export const loadFromStorage = (names) => {
         names,
     };
 };
+
+export const saveTeamName = ({teams}) => {
+    return {
+        type: "saveTeamName",
+        teams,
+    };
+};

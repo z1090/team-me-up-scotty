@@ -15,7 +15,7 @@ export const shuffle = (array) => {
 };
 
 
-export const splitIntoTeams = (array, numberOfTeams) => {
+export const splitIntoTeams = (array, numberOfTeams, oldTeams) => {
     let copyOfNames = [...array];
     let teamsArr = [];
     let teams = [];
@@ -42,7 +42,8 @@ export const splitIntoTeams = (array, numberOfTeams) => {
     // Converts each team array into an object
     while(teamsArr.length > 0) {
         teams[teamsArr.length-1] = {
-            teamName: `Team ${teamsArr.length}`,
+            // Keep old team name if teams are regenerated
+            teamName: oldTeams.length === 0 ? `Team ${teamsArr.length}` : oldTeams[teamsArr.length-1].teamName,
             players: teamsArr.pop()
         }
     }
