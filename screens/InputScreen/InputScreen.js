@@ -5,7 +5,6 @@ import {
     View,
     TouchableHighlight,
     TextInput,
-    ScrollView,
     Dimensions,
     ImageBackground,
     SafeAreaView,
@@ -15,9 +14,10 @@ import {
     FlatList,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { BoldText, RegText } from "../../components/typefaces/Montserrat.js";
+import { BoldText } from "../../components/typefaces/Montserrat.js";
 import { isIphoneX } from "../../data/isIphoneX";
 import { FontAwesome as Icon } from "@expo/vector-icons";
+import { noDuplicates } from "../../data/validateInputs";
 
 const HEADER_SIZE = isIphoneX() ? 100 : 60;
 
@@ -40,6 +40,8 @@ export default class App extends React.Component {
         this.refreshData = this.refreshData.bind(this);
         this.addParticipant = this.addParticipant.bind(this);
         this.deleteParticipant = this.deleteParticipant.bind(this);
+        this.removeEmptyInputs = this.removeEmptyInputs.bind(this);
+        this.noEmptyInputs = this.noEmptyInputs.bind(this);
     }
 
     static navigationOptions = ({ navigation }) => ({
@@ -60,7 +62,7 @@ export default class App extends React.Component {
             "Reset Participants?",
             "",
             [
-                { text: "Cancel", onPress: () => console.log("Canceled"), style: "cancel" },
+                { text: "Cancel", onPress: () => {}, style: "cancel" },
                 { text: "OK", onPress: () => this._resetInputs() },
             ],
             { cancelable: false }
@@ -69,7 +71,8 @@ export default class App extends React.Component {
 
     async _resetInputs() {
         await this.props.onResetInputs();
-        this.setState({ names: this.props.names });
+        await this.setState({ names: this.props.names });
+        this.inputIndex.focus();
     }
 
     async addParticipant() {
@@ -78,25 +81,59 @@ export default class App extends React.Component {
     }
 
     deleteParticipant(index) {
-        console.log(index);
         let newState = this.state.names.reduce((acc, val, i) => {
             if (i !== index) {
                 acc.push(val);
             }
             return acc;
         }, [])
-        console.log(newState);
         this.setState({ names: newState });
     }
 
+    async removeEmptyInputs(array) {
+        const reducedNames = array.reduce((acc, val) => {
+            if (val !== "") {
+                acc.push(val);
+            }
+            return acc;
+        }, [])
+        await this.setState({names: reducedNames});
+        this.handlePress();
+     }
+
+    noEmptyInputs(array) {
+        for(let i = 0; i < array.length; i += 1){
+            if(array[i] === "") {
+                Alert.alert(
+                    "Inputs can't be empty",
+                    "Remove empty inputs and continue?",
+                    [
+                        { text: "Cancel", onPress: () => {}, style: "cancel" },
+                        { text: "OK", onPress: () => this.removeEmptyInputs(array) },
+                    ],
+                    { cancelable: false }
+                );
+            return null;
+            }
+        }
+        return this.handlePress();
+     }
+
     handlePress() {
-        if (this.state.names.length >= 3 && this.state.names[0] !== "" && this.state.names[1] !== "" && this.state.names[2] !== "") {
+        const { names } = this.state;
+        if (noDuplicates(names) && this.state.names.length >= 3) {
             this.props.onGenerateTeams(this.state);
-            let namesStr = JSON.stringify(this.state.names);
-            AsyncStorage.multiSet([["names", namesStr]], () => {
-                console.log("Values stored");
-            });
+            AsyncStorage.multiSet([["names", JSON.stringify(names)]]);
             this.props.navigation.navigate("Teams");
+        } else if (!noDuplicates(names)) {
+            Alert.alert(
+                "Duplicate names not allowed",
+                "",
+                [
+                    { text: "Cancel", onPress: () => {}, style: "cancel" },
+                ],
+                { cancelable: true }
+            );
         }
     }
 
@@ -117,12 +154,10 @@ export default class App extends React.Component {
                     value={item}
                     onChange={(e) => {
                         newNames[index] = e.nativeEvent.text;
-                        console.log(newNames);
                         this.setState({ names: newNames })
                     }}
                 />
                 <TouchableOpacity style={styles.rowDelete} title="plus" color="#fff" onPress={() => {
-                    console.log(index);
                     this.deleteParticipant(index)}
                 } >
                     <Icon style={styles.deleteIcon} name="close" size={16} color="#FFF" />
@@ -168,9 +203,10 @@ export default class App extends React.Component {
                         </KeyboardAwareScrollView>
                     </View>
                     <View style={styles.btnContainer}>
-                        <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={this.handlePress}>
+                        {this.state.names.length < 3 ? null : <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={() => this.noEmptyInputs(this.state.names)}>
                             <BoldText style={styles.btnText}>Generate Teams</BoldText>
-                        </TouchableHighlight>
+                        </TouchableHighlight>}
+                        
                     </View>
                 </SafeAreaView>
             </ImageBackground>
