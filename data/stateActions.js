@@ -3,7 +3,6 @@ export const reset = () => ({
 });
 
 export const generateTeams = ({ names }) => {
-    console.log(names);
     return {
         type: "generateTeams",
         names,
@@ -26,5 +25,12 @@ export const loadFromStorage = (names) => {
     return {
         type: "loadFromStorage",
         names,
+    };
+};
+
+export const saveTeamName = ({teams}) => {
+    return {
+        type: "saveTeamName",
+        teams,
     };
 };
