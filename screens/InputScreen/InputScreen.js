@@ -291,7 +291,6 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderBottomWidth: 1,
         height: 35,
-        // width: "100%",
         marginBottom: 8,
         paddingRight: 8,
         fontFamily: "montserrat-regular",

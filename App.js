@@ -8,7 +8,6 @@ import cacheAssetsAsync from "./utilities/cacheAssetsAsync";
 
 StatusBar.setBarStyle("light-content");
 
-
 //================================================================
 // Store Initial Setup ===========================================
 import { createStore, compose, applyMiddleware } from "redux";
@@ -24,18 +23,19 @@ const createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
 const store = createStoreWithMiddleware(reducer, initialState, reduxDevTools());
 //================================================================
 
-
 //================================================================
 // Navigation Setup ==============================================
 import InputScreen from "./screens/InputScreen";
 import TeamsScreen from "./screens/TeamsScreen";
+import TeamNameModalScreen from "./screens/TeamNameModalScreen";
 
-const rootNav = createStackNavigator(
+const mainNavStack = createStackNavigator(
     {
         Input: InputScreen,
         Teams: TeamsScreen,
     },
     {
+        initialRouteName: "Input",
         headerLayoutPreset: "center",
         defaultNavigationOptions: {
             headerTitleStyle: {
@@ -52,7 +52,22 @@ const rootNav = createStackNavigator(
     }
 );
 
-const Navigation = createAppContainer(rootNav);
+const rootNavStack = createStackNavigator(
+    {
+      Main: {
+        screen: mainNavStack,
+      },
+      teamNameModal: {
+        screen: TeamNameModalScreen,
+      },
+    },
+    {
+      mode: 'modal',
+      headerMode: 'none',
+    }
+  );
+
+const Navigation = createAppContainer(rootNavStack);
 
 //================================================================
 
@@ -65,14 +80,13 @@ export default class App extends React.Component {
     componentWillMount() {
         AsyncStorage.multiGet(["names"], (e, results) => {
             if (results[0][1] !== null) {
-                const loadedState = { names: JSON.parse(results[0][1])}
+                const loadedState = { names: JSON.parse(results[0][1]), numberOfTeams: 3 };
                 const loadedStore = createStoreWithMiddleware(reducer, loadedState, reduxDevTools());
-                this.setState({storeInState: loadedStore})
+                this.setState({ storeInState: loadedStore });
             }
         });
         this._loadAssetsAsync();
     }
-
 
     async _loadAssetsAsync() {
         try {

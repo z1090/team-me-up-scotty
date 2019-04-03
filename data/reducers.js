@@ -1,4 +1,3 @@
-import { AsyncStorage } from "react-native";
 import initialState from "./initialState";
 
 import { shuffle, splitIntoTeams } from "./LogicFunctions";
@@ -8,12 +7,12 @@ const setInitial = () => initialState;
 const generateTeams = (state, action) => ({
     ...state,
     names: action.names,
-    teams: splitIntoTeams(shuffle(action.names)),
+    teams: splitIntoTeams(shuffle(action.names), state.numberOfTeams),
 });
 
 const regenerateTeams = (state) => ({
     ...state,
-    teams: splitIntoTeams(shuffle(state.names)),
+    teams: splitIntoTeams(shuffle(state.names), state.numberOfTeams),
 });
 
 const resetInputs = (state) => ({
