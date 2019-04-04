@@ -54,18 +54,18 @@ const mainNavStack = createStackNavigator(
 
 const rootNavStack = createStackNavigator(
     {
-      Main: {
-        screen: mainNavStack,
-      },
-      teamNameModal: {
-        screen: TeamNameModalScreen,
-      },
+        Main: {
+            screen: mainNavStack,
+        },
+        teamNameModal: {
+            screen: TeamNameModalScreen,
+        },
     },
     {
-      mode: 'modal',
-      headerMode: 'none',
+        mode: "modal",
+        headerMode: "none",
     }
-  );
+);
 
 const Navigation = createAppContainer(rootNavStack);
 
@@ -80,7 +80,7 @@ export default class App extends React.Component {
     componentWillMount() {
         AsyncStorage.multiGet(["names"], (e, results) => {
             if (results[0][1] !== null) {
-                const loadedState = { names: JSON.parse(results[0][1]), numberOfTeams: 3, teams: [] };
+                const loadedState = { names: JSON.parse(results[0][1]), numberOfTeams: 5, teams: [] };
                 const loadedStore = createStoreWithMiddleware(reducer, loadedState, reduxDevTools());
                 this.setState({ storeInState: loadedStore });
             }

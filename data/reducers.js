@@ -5,11 +5,12 @@ import { shuffle, splitIntoTeams } from "./LogicFunctions";
 const setInitial = () => initialState;
 
 const generateTeams = (state, action) => {
-    return ({
-    ...state,
-    names: action.names,
-    teams: splitIntoTeams(shuffle(action.names), state.numberOfTeams, state.teams),
-})};
+    return {
+        ...state,
+        names: action.names,
+        teams: splitIntoTeams(shuffle(action.names), state.numberOfTeams, state.teams),
+    };
+};
 
 const regenerateTeams = (state) => ({
     ...state,
