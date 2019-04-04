@@ -7,6 +7,8 @@ export const generateTeamName = () => {
         "twisters",
         "ice cubes",
         "slippers",
+        "wives",
+        "beasts",
         "air fresheners",
         "shoes",
         "leg warmers",

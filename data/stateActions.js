@@ -34,3 +34,10 @@ export const saveTeamName = ({teams}) => {
         teams,
     };
 };
+
+export const submitSettings = (settings) => {
+    return {
+        type: "submitSettings",
+        settings,
+    };
+};
