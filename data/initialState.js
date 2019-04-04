@@ -1,8 +1,8 @@
 let initialState = {
-    names: [
-        "",
-    ],
-    numberOfTeams: 3,
+    names: [""],
+    settings: {
+        numberOfTeams: 2,
+    },
     teams: [],
 };
 

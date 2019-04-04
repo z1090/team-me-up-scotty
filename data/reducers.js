@@ -8,13 +8,13 @@ const generateTeams = (state, action) => {
     return {
         ...state,
         names: action.names,
-        teams: splitIntoTeams(shuffle(action.names), state.numberOfTeams, state.teams),
+        teams: splitIntoTeams(shuffle(action.names), state.settings.numberOfTeams, state.teams),
     };
 };
 
 const regenerateTeams = (state) => ({
     ...state,
-    teams: splitIntoTeams(shuffle(state.names), state.numberOfTeams, state.teams),
+    teams: splitIntoTeams(shuffle(state.names), state.settings.numberOfTeams, state.teams),
 });
 
 const resetInputs = (state) => ({
@@ -32,6 +32,11 @@ const saveTeamName = (state, action) => ({
     teams: action.teams,
 });
 
+const submitSettings = (state, action) => ({
+    ...state,
+    settings: action.settings,
+});
+
 const reducer = (state, action) => {
     switch (action.type) {
         case "reset":
@@ -46,6 +51,8 @@ const reducer = (state, action) => {
             return loadFromStorage(state, action);
         case "saveTeamName":
             return saveTeamName(state, action);
+        case "submitSettings":
+            return submitSettings(state, action);
         default:
             return state;
     }

@@ -35,6 +35,7 @@ export default class App extends React.Component {
         };
         this.handlePress = this.handlePress.bind(this);
         this._resetAlertHandler = this._resetAlertHandler.bind(this);
+        this._goToSettingsModal = this._goToSettingsModal.bind(this);
         this._resetInputs = this._resetInputs.bind(this);
         this.renderItem = this.renderItem.bind(this);
         this.refreshData = this.refreshData.bind(this);
@@ -47,14 +48,26 @@ export default class App extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         title: "Participants",
         headerRight: (
-            <TouchableOpacity title="reset" color="#fff" onPress={navigation.getParam("_resetAlertHandler")}>
-                <Icon style={styles.icon} name="undo" size={24} color="#FFF" />
-            </TouchableOpacity>
+            <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity title="reset" color="#fff" onPress={navigation.getParam("_resetAlertHandler")}>
+                    <Icon style={styles.icon} name="undo" size={24} color="#FFF" />
+                </TouchableOpacity>
+                <TouchableOpacity title="reset" color="#fff" onPress={navigation.getParam("_goToSettingsModal")}>
+                    <Icon style={styles.settingsIcon} name="ellipsis-v" size={24} color="#FFF" />
+                </TouchableOpacity>
+            </View>
         ),
     });
 
     componentDidMount() {
-        this.props.navigation.setParams({ _resetAlertHandler: this._resetAlertHandler });
+        this.props.navigation.setParams({
+            _resetAlertHandler: this._resetAlertHandler,
+            _goToSettingsModal: this._goToSettingsModal,
+        });
+    }
+
+    _goToSettingsModal() {
+        this.props.navigation.navigate("Settings");
     }
 
     _resetAlertHandler() {
@@ -86,7 +99,7 @@ export default class App extends React.Component {
                 acc.push(val);
             }
             return acc;
-        }, [])
+        }, []);
         this.setState({ names: newState });
     }
 
@@ -96,14 +109,14 @@ export default class App extends React.Component {
                 acc.push(val);
             }
             return acc;
-        }, [])
-        await this.setState({names: reducedNames});
+        }, []);
+        await this.setState({ names: reducedNames });
         this.handlePress();
-     }
+    }
 
     noEmptyInputs(array) {
-        for(let i = 0; i < array.length; i += 1){
-            if(array[i] === "") {
+        for (let i = 0; i < array.length; i += 1) {
+            if (array[i] === "") {
                 Alert.alert(
                     "Inputs can't be empty",
                     "Remove empty inputs and continue?",
@@ -113,11 +126,11 @@ export default class App extends React.Component {
                     ],
                     { cancelable: false }
                 );
-            return null;
+                return null;
             }
         }
         return this.handlePress();
-     }
+    }
 
     handlePress() {
         const { names } = this.state;
@@ -126,20 +139,14 @@ export default class App extends React.Component {
             AsyncStorage.multiSet([["names", JSON.stringify(names)]]);
             this.props.navigation.navigate("Teams");
         } else if (!noDuplicates(names)) {
-            Alert.alert(
-                "Duplicate names not allowed",
-                "",
-                [
-                    { text: "Cancel", onPress: () => {}, style: "cancel" },
-                ],
-                { cancelable: true }
-            );
+            Alert.alert("Duplicate names not allowed", "", [{ text: "Cancel", onPress: () => {}, style: "cancel" }], {
+                cancelable: true,
+            });
         }
     }
 
-
     renderItem({ item, index }) {
-        let newNames = [...this.state.names]
+        let newNames = [...this.state.names];
         let playerNum = String(index + 1).padStart(2, "0");
 
         return (
@@ -148,22 +155,29 @@ export default class App extends React.Component {
                     <Text style={styles.rowNumber}>{playerNum}</Text>
                 </View>
                 <TextInput
-                    ref={(input) => { this.inputIndex = input; }}
+                    ref={(input) => {
+                        this.inputIndex = input;
+                    }}
                     style={styles.textInput}
                     maxLength={30}
                     value={item}
                     onChange={(e) => {
                         newNames[index] = e.nativeEvent.text;
-                        this.setState({ names: newNames })
+                        this.setState({ names: newNames });
                     }}
                 />
-                <TouchableOpacity style={styles.rowDelete} title="plus" color="#fff" onPress={() => {
-                    this.deleteParticipant(index)}
-                } >
+                <TouchableOpacity
+                    style={styles.rowDelete}
+                    title="plus"
+                    color="#fff"
+                    onPress={() => {
+                        this.deleteParticipant(index);
+                    }}
+                >
                     <Icon style={styles.deleteIcon} name="close" size={16} color="#FFF" />
                 </TouchableOpacity>
             </View>
-        )
+        );
     }
 
     keyExtractor(item, index) {
@@ -187,13 +201,13 @@ export default class App extends React.Component {
                             keyboardShouldPersistTaps="handled"
                         >
                             <View style={styles.inputContainer}>
-                            <FlatList
-                                data={names}
-                                renderItem={this.renderItem}
-                                keyExtractor={this.keyExtractor}
-                                onRefresh={this.refreshData}
-                                refreshing={loading}
-                            />
+                                <FlatList
+                                    data={names}
+                                    renderItem={this.renderItem}
+                                    keyExtractor={this.keyExtractor}
+                                    onRefresh={this.refreshData}
+                                    refreshing={loading}
+                                />
                             </View>
                             <View style={styles.addBtnContainer}>
                                 <TouchableOpacity title="plus" color="#fff" onPress={this.addParticipant}>
@@ -203,10 +217,15 @@ export default class App extends React.Component {
                         </KeyboardAwareScrollView>
                     </View>
                     <View style={styles.btnContainer}>
-                        {this.state.names.length < 3 ? null : <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={() => this.noEmptyInputs(this.state.names)}>
-                            <BoldText style={styles.btnText}>Generate Teams</BoldText>
-                        </TouchableHighlight>}
-                        
+                        {this.state.names.length < 3 ? null : (
+                            <TouchableHighlight
+                                style={styles.btn}
+                                underlayColor={"#1B5E20"}
+                                onPress={() => this.noEmptyInputs(this.state.names)}
+                            >
+                                <BoldText style={styles.btnText}>Generate Teams</BoldText>
+                            </TouchableHighlight>
+                        )}
                     </View>
                 </SafeAreaView>
             </ImageBackground>
@@ -298,7 +317,6 @@ const styles = StyleSheet.create({
     },
     btnContainer: {
         flex: 1,
-        // backgroundColor: "rgba(0, 0, 0, 0.1)",
         width: "100%",
         alignItems: "center",
         justifyContent: "center",
@@ -321,6 +339,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     icon: {
-        marginRight: 16,
+        marginRight: 20,
+    },
+    settingsIcon: {
+        marginRight: 22,
     },
 });
