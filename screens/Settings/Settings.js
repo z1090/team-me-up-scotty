@@ -11,6 +11,7 @@ import {
     Keyboard,
     Platform,
 } from "react-native";
+import SwitchToggle from "react-native-switch-toggle";
 import { isIphoneX } from "../../data/isIphoneX";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 import { BoldText, RegText } from "../../components/typefaces/Montserrat.js";
@@ -22,10 +23,16 @@ export default class App extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = { numberOfTeams: this.props.settings.numberOfTeams };
+        this.state = {
+            numberOfTeams: this.props.settings.numberOfTeams,
+            ratingsOn: this.props.settings.ratingsOn,
+            looseRatings: this.props.settings.looseRatings,
+        };
 
         this.handleSumbitSettings = this.handleSumbitSettings.bind(this);
         this.handleAndroidInputChange = this.handleAndroidInputChange.bind(this);
+        this.handleRatingsSwitch = this.handleRatingsSwitch.bind(this);
+        this.handleLooseRatingsSwitch = this.handleLooseRatingsSwitch.bind(this);
     }
 
     handleSumbitSettings() {
@@ -47,6 +54,14 @@ export default class App extends React.Component {
             });
         }
     };
+
+    handleRatingsSwitch() {
+        this.setState({ ratingsOn: !this.state.ratingsOn });
+    }
+
+    handleLooseRatingsSwitch() {
+        this.setState({ looseRatings: !this.state.looseRatings });
+    }
 
     render() {
         const { numberOfTeams } = this.state;
@@ -82,6 +97,60 @@ export default class App extends React.Component {
                             />
                         )}
                     </View>
+                    <View style={styles.settingRow}>
+                        <BoldText style={styles.settingName}>Use player ratings:</BoldText>
+                        <SwitchToggle
+                            containerStyle={{
+                                width: 50,
+                                height: 20,
+                                borderRadius: 30,
+                                padding: 5,
+                            }}
+                            backgroundColorOn="#4F9F4F"
+                            backgroundColorOff="#e5e5e5"
+                            circleStyle={{
+                                width: 12,
+                                height: 12,
+                                borderRadius: 6,
+                                backgroundColor: "#FFF",
+                            }}
+                            switchOn={this.state.ratingsOn}
+                            onPress={this.handleRatingsSwitch}
+                            circleColorOff="#4F9F4F"
+                            circleColorOn="#FFF"
+                            duration={500}
+                        />
+                    </View>
+                    {this.state.ratingsOn ? (
+                        <View style={styles.ratingsRow}>
+                            <RegText style={styles.ratingsName}>Precise ratings</RegText>
+                            <View style={styles.ratingTypeSwitch}>
+                                <SwitchToggle
+                                    containerStyle={{
+                                        width: 50,
+                                        height: 20,
+                                        borderRadius: 30,
+                                        padding: 5,
+                                    }}
+                                    backgroundColorOn="#e5e5e5"
+                                    backgroundColorOff="#e5e5e5"
+                                    circleStyle={{
+                                        width: 12,
+                                        height: 12,
+                                        borderRadius: 6,
+                                        backgroundColor: "#FFF",
+                                    }}
+                                    switchOn={this.state.looseRatings}
+                                    onPress={this.handleLooseRatingsSwitch}
+                                    circleColorOff="#4F9F4F"
+                                    circleColorOn="#4F9F4F"
+                                    duration={500}
+                                />
+                            </View>
+
+                            <RegText style={[styles.ratingsName, { textAlign: "right" }]}>Loose ratings</RegText>
+                        </View>
+                    ) : null}
                 </View>
                 <View style={styles.btnContainer}>
                     <View style={styles.btnInnerContainer}>
@@ -123,15 +192,36 @@ const styles = StyleSheet.create({
     settingHeading: {
         color: "#448844",
         fontSize: 22,
+        marginBottom: 20,
     },
     settingName: {
         flex: 1,
         color: "#4F9F4F",
     },
+    ratingTypeSwitch: {
+        alignContent: "center",
+    },
+    ratingsName: {
+        width: 100,
+        flex: 1,
+        color: "#4F9F4F",
+        lineHeight: 16,
+        // backgroundColor: "red",
+    },
     settingRow: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
+        marginBottom: 20,
+    },
+    ratingsRow: {
+        width: 200,
+        alignSelf: "center",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        marginBottom: 20,
+        // backgroundColor: "blue",
     },
     textInput: {
         borderColor: "#69B569",
