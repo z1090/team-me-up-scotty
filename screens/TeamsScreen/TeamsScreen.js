@@ -24,7 +24,7 @@ const win = Dimensions.get("window");
 
 import BackgroundImg from "../../assets/teams-background.jpg";
 
-export default class App extends React.Component {
+export default class TeamScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
         // const params = navigation.state.params || {};
         return {
@@ -87,6 +87,13 @@ export default class App extends React.Component {
     }
 
     renderTeams({ item, index }) {
+        let teamRating = 0;
+        item.players.forEach((player) => {
+            teamRating += this.props.looseRatings ? player.randomMatchRating : player.enteredRating;
+        });
+
+        console.log(teamRating);
+        console.log(this.props.ratingsOn);
         return (
             <View style={styles.innerContainer}>
                 <View style={styles.teamName}>
@@ -106,6 +113,11 @@ export default class App extends React.Component {
                 <View style={styles.teamList}>
                     <FlatList data={item.players} renderItem={this.renderPlayers} keyExtractor={this.keyExtractor} />
                 </View>
+                {!this.props.ratingsOn ? null : (
+                    <View style={styles.teamRating}>
+                        <BoldText>Team Rating: {teamRating}</BoldText>
+                    </View>
+                )}
             </View>
         );
     }
@@ -117,7 +129,7 @@ export default class App extends React.Component {
                 <View style={{ width: 30 }}>
                     <BoldText>{playerNum}</BoldText>
                 </View>
-                <RegText>{item}</RegText>
+                <RegText>{item.name}</RegText>
             </View>
         );
     }
@@ -263,6 +275,10 @@ const styles = StyleSheet.create({
         marginLeft: 20,
     },
     teamList: {
+        paddingHorizontal: 20,
+        paddingBottom: 2,
+    },
+    teamRating: {
         paddingHorizontal: 20,
         paddingBottom: 20,
     },

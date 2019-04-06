@@ -1,6 +1,6 @@
 import initialState from "./initialState";
 
-import { shuffle, splitIntoTeams } from "./LogicFunctions";
+import { getTeams, shuffle, splitIntoTeams } from "./LogicFunctions";
 
 const setInitial = () => initialState;
 
@@ -8,13 +8,31 @@ const generateTeams = (state, action) => {
     return {
         ...state,
         names: action.names,
-        teams: splitIntoTeams(shuffle(action.names), state.settings.numberOfTeams, state.teams),
+        teams: getTeams(
+            state.settings.ratingsOn,
+            state.settings.looseRatings,
+            state.settings.numberOfTeams,
+            action.names,
+            state.teams
+        ),
+        // teams: splitIntoTeams(
+        //     shuffle(action.names, state.settings.ratingsOn),
+        //     state.settings.numberOfTeams,
+        //     state.teams,
+        //     state.settings.ratingsOn
+        // ),
     };
 };
 
 const regenerateTeams = (state) => ({
     ...state,
-    teams: splitIntoTeams(shuffle(state.names), state.settings.numberOfTeams, state.teams),
+    teams: getTeams(
+        state.settings.ratingsOn,
+        state.settings.looseRatings,
+        state.settings.numberOfTeams,
+        state.names,
+        state.teams
+    ),
 });
 
 const resetInputs = (state) => ({

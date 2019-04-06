@@ -12,26 +12,28 @@ import {
     Alert,
     AsyncStorage,
     FlatList,
+    Platform,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { BoldText } from "../../components/typefaces/Montserrat.js";
 import { isIphoneX } from "../../data/isIphoneX";
 import { FontAwesome as Icon } from "@expo/vector-icons";
-import { noDuplicates } from "../../data/validateInputs";
 
 const HEADER_SIZE = isIphoneX() ? 100 : 60;
+const isIOS = Platform.OS === "ios";
 
 import BackgroundImg from "../../assets/participants-background.jpg";
 
 const win = Dimensions.get("window");
 
-export default class App extends React.Component {
+export default class InputScreen extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             names: this.props.names,
             loading: false,
+            ratingsOn: this.props.settings.ratingsOn,
         };
         this.handlePress = this.handlePress.bind(this);
         this._resetAlertHandler = this._resetAlertHandler.bind(this);
@@ -42,6 +44,7 @@ export default class App extends React.Component {
         this.addParticipant = this.addParticipant.bind(this);
         this.deleteParticipant = this.deleteParticipant.bind(this);
         this.removeEmptyInputs = this.removeEmptyInputs.bind(this);
+        this.noDuplicates = this.noDuplicates.bind(this);
         this.noEmptyInputs = this.noEmptyInputs.bind(this);
     }
 
@@ -89,7 +92,7 @@ export default class App extends React.Component {
     }
 
     async addParticipant() {
-        await this.setState({ names: this.state.names.concat("") });
+        await this.setState({ names: this.state.names.concat({ name: "", enteredRating: 50, randomMatchRating: 50 }) });
         this.inputIndex.focus();
     }
 
@@ -103,9 +106,21 @@ export default class App extends React.Component {
         this.setState({ names: newState });
     }
 
+    noDuplicates = (array) => {
+        let checked = Object.create(null);
+        for (let i = 0; i < array.length; i += 1) {
+            let value = array[i].name;
+            if (value in checked) {
+                return false;
+            }
+            checked[value] = false;
+        }
+        return true;
+    };
+
     async removeEmptyInputs(array) {
         const reducedNames = array.reduce((acc, val) => {
-            if (val !== "") {
+            if (val.name !== "") {
                 acc.push(val);
             }
             return acc;
@@ -116,7 +131,7 @@ export default class App extends React.Component {
 
     noEmptyInputs(array) {
         for (let i = 0; i < array.length; i += 1) {
-            if (array[i] === "") {
+            if (array[i].name === "") {
                 Alert.alert(
                     "Inputs can't be empty",
                     "Remove empty inputs and continue?",
@@ -134,11 +149,11 @@ export default class App extends React.Component {
 
     handlePress() {
         const { names } = this.state;
-        if (noDuplicates(names) && this.state.names.length >= 3) {
+        if (this.noDuplicates(names) && this.state.names.length >= 3) {
             this.props.onGenerateTeams(this.state);
             AsyncStorage.multiSet([["names", JSON.stringify(names)]]);
             this.props.navigation.navigate("Teams");
-        } else if (!noDuplicates(names)) {
+        } else if (!this.noDuplicates(names)) {
             Alert.alert("Duplicate names not allowed", "", [{ text: "Cancel", onPress: () => {}, style: "cancel" }], {
                 cancelable: true,
             });
@@ -160,12 +175,25 @@ export default class App extends React.Component {
                     }}
                     style={styles.textInput}
                     maxLength={30}
-                    value={item}
+                    value={item.name}
                     onChange={(e) => {
-                        newNames[index] = e.nativeEvent.text;
+                        newNames[index].name = e.nativeEvent.text;
                         this.setState({ names: newNames });
                     }}
                 />
+                {!this.props.settings.ratingsOn ? null : (
+                    <TextInput
+                        keyboardType={"number-pad"}
+                        style={styles.ratingInput}
+                        maxLength={3}
+                        value={item.enteredRating === 0 ? "" : `${item.enteredRating}`}
+                        onChange={(e) => {
+                            const text = +e.nativeEvent.text;
+                            newNames[index].enteredRating = text > 100 ? 100 : text < 0 ? 0 : text;
+                            this.setState({ names: newNames });
+                        }}
+                    />
+                )}
                 <TouchableOpacity
                     style={styles.rowDelete}
                     title="plus"
@@ -189,6 +217,8 @@ export default class App extends React.Component {
     }
 
     render() {
+        console.log(this.props.settings);
+        console.log(this.state.ratingsOn);
         const { names, loading } = this.state;
         return (
             <ImageBackground source={BackgroundImg} style={styles.background}>
@@ -203,6 +233,7 @@ export default class App extends React.Component {
                             <View style={styles.inputContainer}>
                                 <FlatList
                                     data={names}
+                                    extraData={this.props}
                                     renderItem={this.renderItem}
                                     keyExtractor={this.keyExtractor}
                                     onRefresh={this.refreshData}
@@ -315,6 +346,18 @@ const styles = StyleSheet.create({
         fontFamily: "montserrat-regular",
         color: "#FFF",
     },
+    ratingInput: {
+        borderColor: "#69B569",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        width: 35,
+        height: 35,
+        marginBottom: 8,
+        paddingRight: 8,
+        fontFamily: "montserrat-regular",
+        color: "#FFF",
+        textAlign: "right",
+    },
     btnContainer: {
         flex: 1,
         width: "100%",
@@ -339,9 +382,10 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     icon: {
-        marginRight: 20,
+        marginRight: 15,
     },
     settingsIcon: {
+        marginLeft: 20,
         marginRight: 22,
     },
 });

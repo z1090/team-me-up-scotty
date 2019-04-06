@@ -78,12 +78,14 @@ export default class App extends React.Component {
     };
 
     componentWillMount() {
-        AsyncStorage.multiGet(["names"], (e, results) => {
+        AsyncStorage.multiGet(["namez"], (e, results) => {
             if (results[0][1] !== null) {
                 const loadedState = {
                     names: JSON.parse(results[0][1]),
                     settings: {
                         numberOfTeams: 2,
+                        ratingsOn: false,
+                        looseRatings: false,
                     },
                     teams: [],
                 };

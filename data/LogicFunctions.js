@@ -1,50 +1,13 @@
-export const shuffle = (array) => {
-    let newArr = [...array];
-    let length = newArr.length;
-    let randomIndex;
-    let tempValue;
-
-    while (length > 0) {
-        randomIndex = Math.floor(Math.random() * length);
-        length -= 1;
-        tempValue = newArr[length];
-        newArr[length] = newArr[randomIndex];
-        newArr[randomIndex] = tempValue;
-    }
-    return newArr;
+export const getTeams = (ratingsOn, looseRatings, numberOfTeams, names, oldTeams) => {
+    return ratingsOn
+        ? teamNames(oldTeams, randomShuffle(shuffledPlayersinTeam(ratedSplit(ratedShuffle(names, numberOfTeams, looseRatings), numPlayersPerTeam(names, numberOfTeams)))))
+        : teamNames(oldTeams, randomSplit(randomShuffle(names), numPlayersPerTeam(names, numberOfTeams)));
 };
 
-const oldTeamNames = (teamsArr, oldTeams, numberOfTeams) => {
-    let currentIndex = teamsArr.length - 1;
-    if (oldTeams.length === 0) {
-        return `Team ${teamsArr.length}`;
-    } else if (oldTeams.length >= numberOfTeams) {
-        return oldTeams[currentIndex].teamName;
-    } else if (oldTeams.length < numberOfTeams) {
-        // console.log("new teams greater than old")
-        // console.dir(oldTeams[currentIndex])
-        // console.log("teamsArr: "+teamsArr)
-        // console.log("teamsArrlen: "+teamsArr.length)
-        // console.log("currentIndex: "+currentIndex)
-
-        if (typeof oldTeams[currentIndex] != "undefined") {
-            // console.log("old name found")
-            return oldTeams[currentIndex].teamName;
-            // return `Team ${teamsArr.length}`;
-        } else {
-            // console.log("generic name used");
-            return `Team ${teamsArr.length}`;
-        }
-        // return !(oldTeams[teamsArr.length-1])? `Team ${teamsArr.length}` : oldTeams[teamsArr.length-1].teamName
-    }
-};
-
-export const splitIntoTeams = (array, numberOfTeams, oldTeams) => {
-    let copyOfNames = [...array];
-    let teamsArr = [];
-    let teams = [];
-    let playersPerTeam = Math.floor(copyOfNames.length / numberOfTeams);
-    let leftOverPlayers = copyOfNames.length % numberOfTeams;
+const numPlayersPerTeam = (names, numberOfTeams) => {
+    const numPlayers = names.length;
+    const playersPerTeam = Math.floor(numPlayers / numberOfTeams);
+    let leftOverPlayers = numPlayers % numberOfTeams;
 
     // Creates an array with an equal number of players for each team
     let playersArray = Array(numberOfTeams).fill(playersPerTeam);
@@ -56,24 +19,123 @@ export const splitIntoTeams = (array, numberOfTeams, oldTeams) => {
         i += 1;
     }
 
-    // Creates an array of arrays of player names (teams) according to number of players allocated for each team
-    let j = 0;
-    while (copyOfNames.length > 0) {
-        teamsArr.push(copyOfNames.splice(0, playersArray[j]));
-        j += 1;
+    return playersArray;
+};
+
+const ratedShuffle = (array, numberOfTeams, looseRatings) => {
+    let ratedShuffleTeams = [];
+    for (i = 0; i < numberOfTeams; i += 1) {
+        ratedShuffleTeams.push([]);
     }
-    const newNumofTeams = teamsArr.length;
+
+    let newArr = [...array];
+
+    for (i = 0; i < newArr.length; i += 1) {}
+
+    if (looseRatings) {
+        newArr.forEach((player) => {
+            let rand = Math.round(Math.random() * 20) - 10;
+            player.randomMatchRating = player.enteredRating + rand;
+            console.log(
+                `rand: ${rand} name: ${player.name} randRating: ${player.randomMatchRating} Rating: ${
+                    player.enteredRating
+                }`
+            );
+        });
+    }
+
+    newArr.sort((a, b) => {
+        if (a.randomMatchRating < b.randomMatchRating) return 1;
+        if (a.randomMatchRating > b.randomMatchRating) return -1;
+        return 0;
+    });
+
+    for (i = 0; i < newArr.length; i += 1) {
+        if (i > 0 && i % ratedShuffleTeams.length === 0) {
+            ratedShuffleTeams.reverse();
+        }
+        let teamNum = i % ratedShuffleTeams.length;
+        let player = newArr[i];
+        console.log(`${player.name} ${player.randomMatchRating} -${player.enteredRating - player.randomMatchRating}`);
+        ratedShuffleTeams[teamNum].push(player);
+    }
+
+    ratedShuffleTeams.reverse();
+    const flatTeams = ratedShuffleTeams.reduce((acc, val) => acc.concat(val), []);
+    return flatTeams;
+};
+
+const randomShuffle = (array) => {
+    console.log("random shuffle");
+    let newArr = [...array];
+    let currentIndex = newArr.length;
+    let randomIndex;
+    let tempValue;
+
+    while (currentIndex > 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        tempValue = newArr[currentIndex];
+        newArr[currentIndex] = newArr[randomIndex];
+        newArr[randomIndex] = tempValue;
+    }
+    return newArr;
+};
+
+const shuffledPlayersinTeam = (array) => {
+    return array.map((teamToShuffle) => {
+        return randomShuffle(teamToShuffle);
+    });
+}
+
+
+const randomSplit = (names, playersArray) => {
+    console.log("random split reached");
+
+    let copyOfNames = [...names];
+    let teamsArr = [];
+
+    // Creates an array of arrays of player names (teams) according to number of players allocated for each team
+    let i = 0;
+    while (copyOfNames.length > 0) {
+        teamsArr.push(copyOfNames.splice(0, playersArray[i]));
+        i += 1;
+    }
+
+    return teamsArr;
+};
+
+const ratedSplit = (names, playersArray) => {
+    console.log("rated split reached==================");
+    playersArray.reverse();
+    let copyOfNames = [...names];
+    let teamsArr = [];
+
+    // Creates an array of arrays of player names (teams) according to number of players allocated for each team
+    let i = 0;
+    while (copyOfNames.length > 0) {
+        // console.dir(copyOfNames);
+        teamsArr.push(copyOfNames.splice(0, playersArray[i]));
+        // copyOfNames.reverse();
+        i += 1;
+    }
+
+    return teamsArr;
+};
+
+const teamNames = (oldTeams, teamsArr) => {
+    let teams = [];
+
     // Converts each team array into an object
     while (teamsArr.length > 0) {
-        // console.log("old: " + oldTeams.length)
-        // console.log("newleng: " + teamsArr.length)
-        // console.log("new: " + newNumofTeams)
-        // console.log(oldTeams[teamsArr.length-1].teamName === true);
-
+        let currentIndex = teamsArr.length - 1;
         teams[teamsArr.length - 1] = {
             // Keep old team name if teams are regenerated
             // teamName: oldTeams.length <= newNumofTeams ? `Team ${teamsArr.length}` : oldTeams[teamsArr.length-1].teamName,
-            teamName: oldTeamNames(teamsArr, oldTeams, numberOfTeams),
+            teamName:
+                typeof oldTeams[currentIndex] != "undefined"
+                    ? oldTeams[currentIndex].teamName
+                    : `Team ${teamsArr.length}`,
             players: teamsArr.pop(),
         };
     }

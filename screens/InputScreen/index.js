@@ -3,8 +3,9 @@ import { connect } from "react-redux";
 import InputScreen from "./InputScreen";
 import { generateTeams, resetInputs } from "../../data/stateActions";
 
-const mapStateToProps = ({ names }) => ({
+const mapStateToProps = ({ names, settings }) => ({
     names,
+    settings,
 });
 
 const mapDispatchToProps = (dispatch) => ({
