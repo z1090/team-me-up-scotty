@@ -93,3 +93,4 @@ If turned off the app will generate completely random teams. Otherwise, ratings 
 
 #Updates
 For updates and planned future work on the app, please visit the projects page on [github](https://github.com/z1090/team-me-up-scotty/projects)
+
