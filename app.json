@@ -18,7 +18,13 @@
         },
         "assetBundlePatterns": ["**/*"],
         "ios": {
-            "supportsTablet": false
-        }
+            "supportsTablet": false,
+            "bundleIdentifier": "com.ianwildsmith.teammeupscotty"
+        },
+        "android": {
+            "package": "com.ianwildsmith.team_me_up_scotty"
+        },
+        "description": "A mobile app that randomly picks 5-a-side football teams from a list of names\n",
+        "githubUrl": "https://github.com/z1090/team-me-up-scotty"
     }
 }
