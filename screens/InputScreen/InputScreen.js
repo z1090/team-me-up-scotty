@@ -16,10 +16,10 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { BoldText } from "../../components/typefaces/Montserrat.js";
-import { isIphoneX } from "../../data/isIphoneX";
+import { HEADER_SIZE } from "../../utilities/isIphoneX";
 import { FontAwesome as Icon } from "@expo/vector-icons";
+import HeaderIcon from "../../components/HeaderIcon";
 
-const HEADER_SIZE = isIphoneX() ? 100 : 60;
 const isIOS = Platform.OS === "ios";
 
 import BackgroundImg from "../../assets/participants-background.jpg";
@@ -52,12 +52,8 @@ export default class InputScreen extends React.Component {
         title: "Participants",
         headerRight: (
             <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity title="reset" color="#fff" onPress={navigation.getParam("_resetAlertHandler")}>
-                    <Icon style={styles.icon} name="undo" size={24} color="#FFF" />
-                </TouchableOpacity>
-                <TouchableOpacity title="reset" color="#fff" onPress={navigation.getParam("_goToSettingsModal")}>
-                    <Icon style={styles.settingsIcon} name="ellipsis-v" size={24} color="#FFF" />
-                </TouchableOpacity>
+                <HeaderIcon iconName={"undo"} onPress={navigation.getParam("_resetAlertHandler")} />
+                <HeaderIcon style={{ marginRight: 5, marginLeft: 10 }} iconName={"ellipsis-v"} onPress={navigation.getParam("_goToSettingsModal")} />
             </View>
         ),
     });
@@ -77,10 +73,7 @@ export default class InputScreen extends React.Component {
         Alert.alert(
             "Reset Participants?",
             "",
-            [
-                { text: "Cancel", onPress: () => {}, style: "cancel" },
-                { text: "OK", onPress: () => this._resetInputs() },
-            ],
+            [{ text: "Cancel", onPress: () => {}, style: "cancel" }, { text: "OK", onPress: () => this._resetInputs() }],
             { cancelable: false }
         );
     }
@@ -135,10 +128,7 @@ export default class InputScreen extends React.Component {
                 Alert.alert(
                     "Inputs can't be empty",
                     "Remove empty inputs and continue?",
-                    [
-                        { text: "Cancel", onPress: () => {}, style: "cancel" },
-                        { text: "OK", onPress: () => this.removeEmptyInputs(array) },
-                    ],
+                    [{ text: "Cancel", onPress: () => {}, style: "cancel" }, { text: "OK", onPress: () => this.removeEmptyInputs(array) }],
                     { cancelable: false }
                 );
                 return null;
@@ -249,11 +239,7 @@ export default class InputScreen extends React.Component {
                     </View>
                     <View style={styles.btnContainer}>
                         {this.state.names.length < 3 ? null : (
-                            <TouchableHighlight
-                                style={styles.btn}
-                                underlayColor={"#1B5E20"}
-                                onPress={() => this.noEmptyInputs(this.state.names)}
-                            >
+                            <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={() => this.noEmptyInputs(this.state.names)}>
                                 <BoldText style={styles.btnText}>Generate Teams</BoldText>
                             </TouchableHighlight>
                         )}

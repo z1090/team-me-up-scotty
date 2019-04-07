@@ -28,11 +28,13 @@ const store = createStoreWithMiddleware(reducer, initialState, reduxDevTools());
 import InputScreen from "./screens/InputScreen";
 import TeamsScreen from "./screens/TeamsScreen";
 import Settings from "./screens/Settings";
+import GameScreen from "./screens/GameScreen";
 
 const mainNavStack = createStackNavigator(
     {
         Input: InputScreen,
         Teams: TeamsScreen,
+        Game: GameScreen,
     },
     {
         initialRouteName: "Input",
@@ -78,16 +80,13 @@ export default class App extends React.Component {
     };
 
     componentWillMount() {
-        AsyncStorage.multiGet(["namez"], (e, results) => {
-            if (results[0][1] !== null) {
+        AsyncStorage.multiGet(["names", "settings", "teams"], (e, results) => {
+            console.log(results);
+            if (results[0][1] && results[1][1] && results[2][1]) {
                 const loadedState = {
                     names: JSON.parse(results[0][1]),
-                    settings: {
-                        numberOfTeams: 2,
-                        ratingsOn: false,
-                        looseRatings: false,
-                    },
-                    teams: [],
+                    settings: JSON.parse(results[1][1]),
+                    teams: JSON.parse(results[2][1]),
                 };
                 const loadedStore = createStoreWithMiddleware(reducer, loadedState, reduxDevTools());
                 this.setState({ storeInState: loadedStore });
