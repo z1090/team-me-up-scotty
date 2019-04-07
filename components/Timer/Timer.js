@@ -18,7 +18,7 @@ export class Timer extends React.Component {
         Audio.setIsEnabledAsync(true);
         const sound = new Audio.Sound();
         const play_sound = (async () => {
-            await sound.loadAsync(require("../../assets/sounds/endWhistle.mp3")); //Error Here
+            await sound.loadAsync(require("../../assets/sounds/endWhistle.mp3"));
             await sound.playAsync();
         })();
     }

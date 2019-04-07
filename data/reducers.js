@@ -52,7 +52,6 @@ const togglePaused = (state) => ({
 });
 
 const resetTimer = (state) => {
-    console.log(state.settings.gameTime);
     return {
         ...state,
         settings: {

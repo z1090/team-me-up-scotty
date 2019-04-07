@@ -72,7 +72,6 @@ const rootNavStack = createStackNavigator(
 );
 
 const Navigation = createAppContainer(rootNavStack);
-
 //================================================================
 
 export default class App extends React.Component {
@@ -99,7 +98,6 @@ export default class App extends React.Component {
     async _loadAssetsAsync() {
         try {
             await cacheAssetsAsync({
-                // images: [require('./assets/images/expo-wordmark.png')],
                 fonts: [
                     { "montserrat-bold": require("./assets/fonts/Montserrat_Bold.ttf") },
                     { "montserrat-regular": require("./assets/fonts/Montserrat-Regular.ttf") },
