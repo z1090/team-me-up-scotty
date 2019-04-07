@@ -1,4 +1,4 @@
-# team-me-up-scotty
+# Team-me-up-scotty
 
 Team Me Up (Scotty) is a mobile app that randomly picks 5-a-side football teams from a list of names. It’s a handy tool to have if teams are selected just before play starts, based on who turns up on the day, rather than a more organised setup where teams are selected in advance. You can create up to 9 teams and enter as many participants as you'd like (3+), so it's not strictly 5-a-side, which is useful if only 9 players turn up! Or if 14 turned up, you could choose either 7-a-side or 2 teams of 5 and one 4.
 
@@ -6,7 +6,9 @@ Team Me Up (Scotty) is a mobile app that randomly picks 5-a-side football teams 
 
 ## Android App Installation
 Download this [APK](https://drive.google.com/drive/folders/1bcA7hpoCwWewikyZK5JWfCBg8uDyf9G4)
-file from your Android device and follow the installation instructions. Android will try to discourage you from installing unknown apps, so you’ll need to specifically allow it to be installed. The Play Store will then also try to stop you installing it – don’t press ‘Okay’, select the ‘install anyway’ option. If you accidentally tapped “Okay”, open the Play Store and edit the options in Play Protect to turn off device scanning, and try the installation again.
+file from your Android device and follow the installation instructions.
+
+Android will try to discourage you from installing unknown apps, so you’ll need to specifically allow it to be installed. The Play Store will then also try to stop you installing it – don’t press ‘Okay’, select the ‘install anyway’ option. If you accidentally tapped “Okay”, open the Play Store and edit the options in Play Protect to turn off device scanning, and try the installation again.
 
 ## iOS App Installation
 
@@ -33,7 +35,7 @@ To install the app, go to the App Store or Google Play Store on your device, and
 
 Install Node and the npm package manager [node](https://nodejs.org/en/download/)
 
-Inside the project folder run:
+Once installed, inside the project folder run:
 
 ```bash
 npm install
@@ -77,7 +79,7 @@ If you are having trouble loading the project, check that the ip address above t
 
 <!-- break -->
 
-#App Settings
+# App Settings
 
 ## Quick Start
 
@@ -91,6 +93,6 @@ If turned off the app will generate completely random teams. Otherwise, ratings 
 
 <!-- break -->
 
-#Updates
+# Updates
 For updates and planned future work on the app, please visit the projects page on [github](https://github.com/z1090/team-me-up-scotty/projects)
 
