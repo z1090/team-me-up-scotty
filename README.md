@@ -86,13 +86,15 @@ If you are having trouble loading the project, check that the ip address above t
 
 ## Quick Start
 
-Only Available if a list of participants has been entered in the past. This will skip straight to the teams page using the preexisting players and settings.
+Only Available if a list of participants has been entered in the past. This will skip straight to the teams page using the pre-existing players and settings.
 
 ## Use Player Ratings Setting
 
 If turned off the app will generate completely random teams. Otherwise, ratings are out of 100 and there are two modes.
+
 **“Precise”** player ratings will generate teams based on the exact values the user entered.
-**“Loose”** ratings will add a random amount between -10 - +10 to the entered value each time the teams are generated. This creates some variety in the teams, but tries to skill spread the skill level evenly between the teams.
+
+**“Loose”** ratings will add a random amount between -10 - +10 to the entered value each time the teams are generated. This creates some variety in the teams, but tries to spread the skill level evenly between the teams.
 
 <!-- break -->
 
