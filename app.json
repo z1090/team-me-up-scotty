@@ -1,29 +1,30 @@
 {
-  "expo": {
-    "name": "Team Me Up Scotty",
-    "slug": "team-me-up",
-    "privacy": "public",
-    "sdkVersion": "32.0.0",
-    "platforms": [
-      "ios",
-      "android"
-    ],
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
+    "expo": {
+        "name": "Team Me Up Scotty",
+        "slug": "team-me-up",
+        "privacy": "public",
+        "sdkVersion": "32.0.0",
+        "platforms": ["ios", "android"],
+        "version": "2.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/images/icon.png",
+        "splash": {
+            "image": "./assets/images/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#50A353"
+        },
+        "updates": {
+            "fallbackToCacheTimeout": 0
+        },
+        "assetBundlePatterns": ["**/*"],
+        "ios": {
+            "supportsTablet": false,
+            "bundleIdentifier": "com.ianwildsmith.teammeupscotty"
+        },
+        "android": {
+            "package": "com.ianwildsmith.team_me_up_scotty"
+        },
+        "description": "A mobile app that randomly picks 5-a-side football teams from a list of names\n",
+        "githubUrl": "https://github.com/z1090/team-me-up-scotty"
     }
-  }
 }

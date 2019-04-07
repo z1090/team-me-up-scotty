@@ -1,9 +1,9 @@
 import React from "react";
 import { TouchableHighlight, Text, View, StyleSheet } from "react-native";
 
-const Button = ({ children, onPress, btnID, title }) => (
+const Button = ({ children, onPress, style }) => (
     <View>
-        <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={() => onPress(btnID, title)}>
+        <TouchableHighlight style={[styles.btn, style]} underlayColor={"#1B5E20"} onPress={onPress}>
             <Text style={styles.btnText}>{children}</Text>
         </TouchableHighlight>
     </View>
@@ -17,12 +17,12 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 8,
         backgroundColor: "#388E3C",
-        marginBottom: 10,
+        marginVertical: 20,
     },
     btnText: {
         fontSize: 18,
-        fontWeight: "bold",
         color: "#FFF",
+        fontFamily: "montserrat-bold",
     },
 });
 
