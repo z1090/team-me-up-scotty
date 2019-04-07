@@ -1,6 +1,5 @@
 import initialState from "./initialState";
-
-import { getTeams, shuffle, splitIntoTeams } from "./LogicFunctions";
+import { getTeams } from "./sortingLogic";
 
 const setInitial = () => initialState;
 
@@ -8,36 +7,24 @@ const generateTeams = (state, action) => {
     return {
         ...state,
         names: action.names,
-        teams: getTeams(
-            state.settings.ratingsOn,
-            state.settings.looseRatings,
-            state.settings.numberOfTeams,
-            action.names,
-            state.teams
-        ),
-        // teams: splitIntoTeams(
-        //     shuffle(action.names, state.settings.ratingsOn),
-        //     state.settings.numberOfTeams,
-        //     state.teams,
-        //     state.settings.ratingsOn
-        // ),
+        teams: getTeams(state.settings.ratingsOn, state.settings.looseRatings, state.settings.numberOfTeams, action.names, state.teams),
     };
 };
 
 const regenerateTeams = (state) => ({
     ...state,
-    teams: getTeams(
-        state.settings.ratingsOn,
-        state.settings.looseRatings,
-        state.settings.numberOfTeams,
-        state.names,
-        state.teams
-    ),
+    teams: getTeams(state.settings.ratingsOn, state.settings.looseRatings, state.settings.numberOfTeams, state.names, state.teams),
 });
 
 const resetInputs = (state) => ({
     ...state,
-    names: [""],
+    names: [
+        {
+            name: "",
+            enteredRating: 50,
+            randomMatchRating: 50,
+        },
+    ],
 });
 
 const loadFromStorage = (state, action) => ({
@@ -55,6 +42,27 @@ const submitSettings = (state, action) => ({
     settings: action.settings,
 });
 
+const togglePaused = (state) => ({
+    ...state,
+    settings: {
+        ...state.settings,
+        gamePaused: !state.settings.gamePaused,
+        gamePauseText: state.settings.gamePauseText === "Start" ? "Pause" : state.settings.gamePauseText === "Pause" ? "Resume" : "Pause",
+    },
+});
+
+const resetTimer = (state) => {
+    console.log(state.settings.gameTime);
+    return {
+        ...state,
+        settings: {
+            ...state.settings,
+            gamePaused: true,
+            gamePauseText: "Start",
+        },
+    };
+};
+
 const reducer = (state, action) => {
     switch (action.type) {
         case "reset":
@@ -71,6 +79,10 @@ const reducer = (state, action) => {
             return saveTeamName(state, action);
         case "submitSettings":
             return submitSettings(state, action);
+        case "togglePaused":
+            return togglePaused(state);
+        case "resetTimer":
+            return resetTimer(state);
         default:
             return state;
     }

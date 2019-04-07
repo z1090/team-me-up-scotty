@@ -1,9 +1,15 @@
 export const getTeams = (ratingsOn, looseRatings, numberOfTeams, names, oldTeams) => {
     return ratingsOn
-        ? teamNames(oldTeams, randomShuffle(shuffledPlayersinTeam(ratedSplit(ratedShuffle(names, numberOfTeams, looseRatings), numPlayersPerTeam(names, numberOfTeams)))))
-        : teamNames(oldTeams, randomSplit(randomShuffle(names), numPlayersPerTeam(names, numberOfTeams)));
+        ? teamNames(
+              oldTeams,
+              randomShuffle(
+                  shufflePlayersinTeam(ratedSplit(ratedShuffle(names, numberOfTeams, looseRatings), numPlayersPerTeam(names, numberOfTeams)))
+              )
+          )
+        : teamNames(oldTeams, splitIntoTeams(randomShuffle(names), numPlayersPerTeam(names, numberOfTeams)));
 };
 
+//Creates an Array of the number of players for each team
 const numPlayersPerTeam = (names, numberOfTeams) => {
     const numPlayers = names.length;
     const playersPerTeam = Math.floor(numPlayers / numberOfTeams);
@@ -23,40 +29,39 @@ const numPlayersPerTeam = (names, numberOfTeams) => {
 };
 
 const ratedShuffle = (array, numberOfTeams, looseRatings) => {
-    let ratedShuffleTeams = [];
-    for (i = 0; i < numberOfTeams; i += 1) {
-        ratedShuffleTeams.push([]);
-    }
-
-    let newArr = [...array];
-
-    for (i = 0; i < newArr.length; i += 1) {}
+    //copies names array to keep original in order, then
+    //orders players in new arry by either loose or precise rating
+    let players = [...array];
 
     if (looseRatings) {
-        newArr.forEach((player) => {
+        players.forEach((player) => {
             let rand = Math.round(Math.random() * 20) - 10;
             player.randomMatchRating = player.enteredRating + rand;
-            console.log(
-                `rand: ${rand} name: ${player.name} randRating: ${player.randomMatchRating} Rating: ${
-                    player.enteredRating
-                }`
-            );
         });
     }
 
-    newArr.sort((a, b) => {
+    players.sort((a, b) => {
         if (a.randomMatchRating < b.randomMatchRating) return 1;
         if (a.randomMatchRating > b.randomMatchRating) return -1;
         return 0;
     });
 
-    for (i = 0; i < newArr.length; i += 1) {
+    // creates an array of blank arrays based on the number of teams
+    let ratedShuffleTeams = [];
+    for (i = 0; i < numberOfTeams; i += 1) {
+        ratedShuffleTeams.push([]);
+    }
+
+    //adds a player to each team in turn, then when each team has the same number of players
+    //the teams array is reversed to keep the overal team rating at equal a possible.
+    //E.G. if there were 3 teams and 6 players rated 1 - 6, each team would have a skill of 7.
+    //The teams array would look like: [[1,6], [2,5], [3,4]]
+    for (i = 0; i < players.length; i += 1) {
         if (i > 0 && i % ratedShuffleTeams.length === 0) {
             ratedShuffleTeams.reverse();
         }
         let teamNum = i % ratedShuffleTeams.length;
-        let player = newArr[i];
-        console.log(`${player.name} ${player.randomMatchRating} -${player.enteredRating - player.randomMatchRating}`);
+        let player = players[i];
         ratedShuffleTeams[teamNum].push(player);
     }
 
@@ -65,33 +70,25 @@ const ratedShuffle = (array, numberOfTeams, looseRatings) => {
     return flatTeams;
 };
 
+//used to either randomise players if ratings are not used or to
+//randomise the order the teams are listed in if ratings are used
 const randomShuffle = (array) => {
-    console.log("random shuffle");
-    let newArr = [...array];
-    let currentIndex = newArr.length;
+    let players = [...array];
+    let currentIndex = players.length;
     let randomIndex;
     let tempValue;
 
     while (currentIndex > 0) {
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex -= 1;
-        tempValue = newArr[currentIndex];
-        newArr[currentIndex] = newArr[randomIndex];
-        newArr[randomIndex] = tempValue;
+        tempValue = players[currentIndex];
+        players[currentIndex] = players[randomIndex];
+        players[randomIndex] = tempValue;
     }
-    return newArr;
+    return players;
 };
 
-const shuffledPlayersinTeam = (array) => {
-    return array.map((teamToShuffle) => {
-        return randomShuffle(teamToShuffle);
-    });
-}
-
-
-const randomSplit = (names, playersArray) => {
-    console.log("random split reached");
-
+const splitIntoTeams = (names, playersArray) => {
     let copyOfNames = [...names];
     let teamsArr = [];
 
@@ -106,21 +103,18 @@ const randomSplit = (names, playersArray) => {
 };
 
 const ratedSplit = (names, playersArray) => {
-    console.log("rated split reached==================");
-    playersArray.reverse();
-    let copyOfNames = [...names];
-    let teamsArr = [];
+    //reversing array ensures that the worst-rated 'leftover'
+    //players get added to the worst-rated teams first,
+    //rather than to the best team first.
+    return splitIntoTeams(names, playersArray.reverse());
+};
 
-    // Creates an array of arrays of player names (teams) according to number of players allocated for each team
-    let i = 0;
-    while (copyOfNames.length > 0) {
-        // console.dir(copyOfNames);
-        teamsArr.push(copyOfNames.splice(0, playersArray[i]));
-        // copyOfNames.reverse();
-        i += 1;
-    }
-
-    return teamsArr;
+//randomises the order rated players are listed within a team
+//so that the best players won't always appear at the top
+const shufflePlayersinTeam = (array) => {
+    return array.map((teamToShuffle) => {
+        return randomShuffle(teamToShuffle);
+    });
 };
 
 const teamNames = (oldTeams, teamsArr) => {
@@ -130,12 +124,8 @@ const teamNames = (oldTeams, teamsArr) => {
     while (teamsArr.length > 0) {
         let currentIndex = teamsArr.length - 1;
         teams[teamsArr.length - 1] = {
-            // Keep old team name if teams are regenerated
-            // teamName: oldTeams.length <= newNumofTeams ? `Team ${teamsArr.length}` : oldTeams[teamsArr.length-1].teamName,
-            teamName:
-                typeof oldTeams[currentIndex] != "undefined"
-                    ? oldTeams[currentIndex].teamName
-                    : `Team ${teamsArr.length}`,
+            // Keeps old team name if teams are regenerated
+            teamName: typeof oldTeams[currentIndex] != "undefined" ? oldTeams[currentIndex].teamName : `Team ${teamsArr.length}`,
             players: teamsArr.pop(),
         };
     }

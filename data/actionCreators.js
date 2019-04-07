@@ -28,7 +28,7 @@ export const loadFromStorage = (names) => {
     };
 };
 
-export const saveTeamName = ({teams}) => {
+export const saveTeamName = ({ teams }) => {
     return {
         type: "saveTeamName",
         teams,
@@ -39,5 +39,17 @@ export const submitSettings = (settings) => {
     return {
         type: "submitSettings",
         settings,
+    };
+};
+
+export const togglePaused = () => {
+    return {
+        type: "togglePaused",
+    };
+};
+
+export const resetTimer = () => {
+    return {
+        type: "resetTimer",
     };
 };

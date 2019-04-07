@@ -1,38 +1,30 @@
 import React from "react";
-import {
-    StyleSheet,
-    Text,
-    View,
-    ImageBackground,
-    TouchableOpacity,
-    TouchableHighlight,
-    FlatList,
-    ScrollView,
-    Modal,
-    Button,
-    Dimensions,
-    TextInput,
-} from "react-native";
+import { StyleSheet, View, ImageBackground, TouchableOpacity, FlatList, Modal, TextInput, AsyncStorage } from "react-native";
 import { FontAwesome as Icon } from "@expo/vector-icons";
 
 import { BoldText, RegText } from "../../components/typefaces/Montserrat.js";
-import { isIphoneX } from "../../data/isIphoneX";
+import Button from "../../components/Button";
+import ButtonSmall from "../../components/ButtonSmall";
+import HeaderIcon from "../../components/HeaderIcon";
+
+import { HEADER_SIZE } from "../../utilities/isIphoneX";
 import { generateTeamName } from "../../utilities/nameGenerator";
 
-const HEADER_SIZE = isIphoneX() ? 100 : 60;
-const win = Dimensions.get("window");
-
-import BackgroundImg from "../../assets/teams-background.jpg";
+import TeamsBackgroundImg from "../../assets/teams-background.jpg";
 
 export default class TeamScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
-        // const params = navigation.state.params || {};
         return {
             title: "Teams",
             headerRight: (
-                <TouchableOpacity title="reset" color="#fff" onPress={navigation.getParam("_regenerateTeams")}>
-                    <Icon style={styles.icon} name="refresh" size={24} color="#FFF" />
-                </TouchableOpacity>
+                <View style={{ flexDirection: "row" }}>
+                    <HeaderIcon iconName={"refresh"} onPress={navigation.getParam("_regenerateTeams")} />
+                    <HeaderIcon
+                        style={{ marginRight: 5, marginLeft: 10 }}
+                        iconName={"ellipsis-v"}
+                        onPress={navigation.getParam("_goToSettingsModal")}
+                    />
+                </View>
             ),
         };
     };
@@ -45,45 +37,64 @@ export default class TeamScreen extends React.Component {
             modalVisible: false,
             currentTeam: 0,
             teams: this.props.teams,
-            coinToss: "Coin Toss",
         };
+        this.handleCloseModal = this.handleCloseModal.bind(this);
+        this.handleEditTeamName = this.handleEditTeamName.bind(this);
+        this.handleStartMatchBtn = this.handleStartMatchBtn.bind(this);
         this.renderPlayers = this.renderPlayers.bind(this);
         this.renderTeams = this.renderTeams.bind(this);
-        this.closeModal = this.closeModal.bind(this);
-        this.setModalVisible = this.setModalVisible.bind(this);
-        this.coinToss = this.coinToss.bind(this);
+        this._goToSettingsModal = this._goToSettingsModal.bind(this);
+        this._regenerateTeams = this._regenerateTeams.bind(this);
     }
 
     componentDidMount() {
         this.props.navigation.setParams({
-            _regenerateTeams: async () => {
-                await this.props.regenerateTeams(this.state);
-                this.setState({ teams: this.props.teams });
-            },
+            _regenerateTeams: this._regenerateTeams,
+            _goToSettingsModal: this._goToSettingsModal,
         });
     }
-    async editTeamName(event, i) {
+    async _regenerateTeams() {
+        await this.props.regenerateTeams(this.state);
+        this.setState({ teams: this.props.teams });
+    }
+
+    _goToSettingsModal() {
+        this.props.navigation.navigate("Settings", { _regenerateTeams: this._regenerateTeams });
+    }
+
+    async handleOpenModal(event, i) {
         this.setState({ currentTeam: i });
-        await this.setModalVisible(true);
+        await this.setState({ modalVisible: true });
         this.inputIndex.focus();
     }
 
-    setModalVisible = (visible) => {
-        this.setState({ modalVisible: visible });
-    };
-
-    closeModal() {
+    handleCloseModal() {
         this.props.saveTeamName(this.state);
-        this.setModalVisible(false);
+        this.setState({ modalVisible: false });
     }
 
-    async coinToss() {
-        await this.setState({ coinToss: "..." });
-        setTimeout(() => {
-            this.setState({
-                coinToss: Math.round(Math.random()) ? "Heads" : "Tails",
-            });
-        }, Math.random() * 1000 + 500);
+    handleEditTeamName(e, inputType) {
+        const { currentTeam, teams } = this.state;
+        let editedTeams = [...teams];
+        switch (inputType) {
+            case "TextInput":
+                editedTeams[currentTeam].teamName = e.nativeEvent.text;
+                break;
+            case "Reset":
+                editedTeams[currentTeam].teamName = `Team ${currentTeam + 1}`;
+                break;
+            case "Random":
+                editedTeams[currentTeam].teamName = generateTeamName();
+                break;
+        }
+        this.setState({ teams: editedTeams });
+    }
+
+    handleStartMatchBtn() {
+        this.props.resetTimer();
+        AsyncStorage.multiSet([["teams", JSON.stringify(this.state.teams)]]);
+
+        this.props.navigation.navigate("Game");
     }
 
     renderTeams({ item, index }) {
@@ -92,29 +103,22 @@ export default class TeamScreen extends React.Component {
             teamRating += this.props.looseRatings ? player.randomMatchRating : player.enteredRating;
         });
 
-        console.log(teamRating);
-        console.log(this.props.ratingsOn);
         return (
-            <View style={styles.innerContainer}>
-                <View style={styles.teamName}>
-                    <TouchableOpacity
-                        style={styles.heading}
-                        title="edit"
-                        color="#fff"
-                        onPress={(event) => this.editTeamName(event, index)}
-                    >
+            <View>
+                <View style={styles.teamNameContainer}>
+                    <TouchableOpacity style={styles.heading} title="edit" color="#fff" onPress={(event) => this.handleOpenModal(event, index)}>
                         <BoldText style={styles.headingText}>{item.teamName}</BoldText>
                     </TouchableOpacity>
-                    <TouchableOpacity title="edit" color="#fff" onPress={(event) => this.editTeamName(event, index)}>
+                    <TouchableOpacity title="edit" color="#fff" onPress={(event) => this.handleOpenModal(event, index)}>
                         <Icon style={styles.teamNameIcon} name="pencil" size={16} color="#FFF" />
                     </TouchableOpacity>
                 </View>
                 <View style={styles.teamNameUnderline} />
-                <View style={styles.teamList}>
+                <View style={this.props.ratingsOn ? styles.teamList : [styles.teamList, styles.teamListPadding]}>
                     <FlatList data={item.players} renderItem={this.renderPlayers} keyExtractor={this.keyExtractor} />
                 </View>
                 {!this.props.ratingsOn ? null : (
-                    <View style={styles.teamRating}>
+                    <View style={[styles.teamRating, styles.teamListPadding]}>
                         <BoldText>Team Rating: {teamRating}</BoldText>
                     </View>
                 )}
@@ -139,20 +143,19 @@ export default class TeamScreen extends React.Component {
     }
 
     render() {
-        let { currentTeam, teams } = this.state;
-        let editedTeams = [...teams];
+        const { currentTeam, teams } = this.state;
         return (
-            <ImageBackground source={BackgroundImg} style={styles.background}>
+            <ImageBackground source={TeamsBackgroundImg} style={styles.background}>
                 <View style={styles.container}>
                     <Modal
                         animationType="fade"
                         transparent={true}
                         visible={this.state.modalVisible}
-                        onRequestClose={() => this.setModalVisible(false)}
+                        onRequestClose={() => this.setState({ modalVisible: false })}
                     >
                         <View style={styles.modalOuterContainer}>
                             <View style={styles.modalContainer}>
-                                <BoldText style={{ color: "#333" }}>Enter Team Name</BoldText>
+                                <BoldText style={{ color: "#388E3C" }}>Enter Team Name</BoldText>
                                 <TextInput
                                     style={styles.textInput}
                                     ref={(input) => {
@@ -160,48 +163,33 @@ export default class TeamScreen extends React.Component {
                                     }}
                                     value={teams[currentTeam].teamName}
                                     onChange={(e) => {
-                                        editedTeams[currentTeam].teamName = e.nativeEvent.text;
-                                        this.setState({ teams: editedTeams });
+                                        this.handleEditTeamName(e, "TextInput");
                                     }}
                                 />
-                                <View style={styles.btnRow}>
-                                    <TouchableHighlight
-                                        style={styles.btnSmall}
-                                        underlayColor={"#1B5E20"}
-                                        onPress={() => {
-                                            editedTeams[currentTeam].teamName = `Team ${currentTeam + 1}`;
-                                            this.setState({ teams: editedTeams });
+                                <View style={styles.smallBtnRow}>
+                                    <ButtonSmall
+                                        onPress={(e) => {
+                                            this.handleEditTeamName(e, "Reset");
                                         }}
                                     >
-                                        <Text style={styles.btnSmallText}>Reset</Text>
-                                    </TouchableHighlight>
-                                    <TouchableHighlight
-                                        style={styles.btnSmall}
-                                        underlayColor={"#1B5E20"}
-                                        onPress={() => {
-                                            editedTeams[currentTeam].teamName = generateTeamName();
-                                            this.setState({ teams: editedTeams });
+                                        Reset
+                                    </ButtonSmall>
+                                    <ButtonSmall
+                                        onPress={(e) => {
+                                            this.handleEditTeamName(e, "Random");
                                         }}
                                     >
-                                        <Text style={styles.btnSmallText}>Random</Text>
-                                    </TouchableHighlight>
-                                    <TouchableHighlight
-                                        style={styles.btnSmall}
-                                        underlayColor={"#1B5E20"}
-                                        onPress={this.closeModal}
-                                    >
-                                        <Text style={styles.btnSmallText}>Close</Text>
-                                    </TouchableHighlight>
+                                        Random
+                                    </ButtonSmall>
+                                    <ButtonSmall onPress={this.handleCloseModal}>Close</ButtonSmall>
                                 </View>
                             </View>
                         </View>
                     </Modal>
                     <FlatList data={this.state.teams} renderItem={this.renderTeams} keyExtractor={this.keyExtractor} />
                 </View>
-                <View style={styles.btnContainer}>
-                    <TouchableHighlight style={styles.btn} underlayColor={"#1B5E20"} onPress={this.coinToss}>
-                        <BoldText style={styles.btnText}>{this.state.coinToss}</BoldText>
-                    </TouchableHighlight>
+                <View style={styles.lowerBtnContainer}>
+                    <Button onPress={this.handleStartMatchBtn}>Start Match</Button>
                 </View>
             </ImageBackground>
         );
@@ -214,7 +202,7 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center",
         justifyContent: "center",
-        marginTop: HEADER_SIZE,
+        marginTop: HEADER_SIZE + 20,
     },
     modalOuterContainer: {
         flex: 1,
@@ -223,12 +211,7 @@ const styles = StyleSheet.create({
         marginTop: 150,
         marginBottom: 200,
     },
-    innerContainer: {
-        // flex: 1,
-        marginTop: 20,
-    },
     modalContainer: {
-        // flex: 1,
         width: "93%",
         height: 140,
         paddingHorizontal: 20,
@@ -246,21 +229,17 @@ const styles = StyleSheet.create({
     headingText: {
         fontSize: 20,
     },
-    icon: {
-        marginRight: 16,
-    },
+
     playerRow: {
         flexDirection: "row",
-        // alignItems: "flex-start",
         justifyContent: "flex-start",
     },
-    teamName: {
+    teamNameContainer: {
         flexDirection: "row",
         justifyContent: "flex-end",
         width: "100%",
         paddingLeft: 20,
         paddingRight: 15,
-        // backgroundColor: "blue",
     },
     teamNameUnderline: {
         marginLeft: 20,
@@ -278,9 +257,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingBottom: 2,
     },
+    teamListPadding: {
+        paddingBottom: 20,
+    },
     teamRating: {
         paddingHorizontal: 20,
-        paddingBottom: 20,
     },
     textInput: {
         borderColor: "#69B569",
@@ -293,43 +274,15 @@ const styles = StyleSheet.create({
         fontFamily: "montserrat-regular",
         color: "#000",
     },
-    btnRow: {
+    smallBtnRow: {
         marginTop: 5,
         flexDirection: "row",
         justifyContent: "center",
     },
-    btnSmall: {
-        alignItems: "center",
-        justifyContent: "center",
-        width: 80,
-        height: 30,
-        borderRadius: 8,
-        backgroundColor: "#388E3C",
-        marginHorizontal: 5,
-    },
-    btnSmallText: {
-        fontFamily: "montserrat-bold",
-        fontSize: 14,
-        color: "#FFF",
-    },
-    btnContainer: {
+    lowerBtnContainer: {
         flex: 1,
-        // backgroundColor: "rgba(0, 0, 0, 0.1)",
         width: "100%",
         alignItems: "center",
         justifyContent: "center",
-    },
-    btn: {
-        alignItems: "center",
-        justifyContent: "center",
-        width: 200,
-        height: 50,
-        borderRadius: 8,
-        backgroundColor: "#388E3C",
-        marginVertical: 20,
-    },
-    btnText: {
-        fontSize: 18,
-        color: "#FFF",
     },
 });

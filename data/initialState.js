@@ -65,6 +65,10 @@ let initialState = {
         numberOfTeams: 3,
         ratingsOn: false,
         looseRatings: false,
+        gameTime: 5,
+        gamePaused: true,
+        gamePauseText: "Start",
+        showCoinToss: true,
     },
     teams: [],
 };
