@@ -4,7 +4,7 @@ Team Me Up (Scotty) is a mobile app that randomly picks 5-a-side football teams 
 
 <!-- break -->
 
-##Android App Installation
+## Android App Installation
 Download this [APK](https://drive.google.com/drive/folders/1bcA7hpoCwWewikyZK5JWfCBg8uDyf9G4)
 file from your Android device and follow the installation instructions. Android will try to discourage you from installing unknown apps, so you’ll need to specifically allow it to be installed. The Play Store will then also try to stop you installing it – don’t press ‘Okay’, select the ‘install anyway’ option. If you accidentally tapped “Okay”, open the Play Store and edit the options in Play Protect to turn off device scanning, and try the installation again.
 
