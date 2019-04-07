@@ -29,15 +29,17 @@ import InputScreen from "./screens/InputScreen";
 import TeamsScreen from "./screens/TeamsScreen";
 import Settings from "./screens/Settings";
 import GameScreen from "./screens/GameScreen";
+import StartScreen from "./screens/StartScreen";
 
 const mainNavStack = createStackNavigator(
     {
+        Start: StartScreen,
         Input: InputScreen,
         Teams: TeamsScreen,
         Game: GameScreen,
     },
     {
-        initialRouteName: "Input",
+        initialRouteName: "Start",
         headerLayoutPreset: "center",
         defaultNavigationOptions: {
             headerTitleStyle: {
@@ -80,8 +82,7 @@ export default class App extends React.Component {
     };
 
     componentWillMount() {
-        AsyncStorage.multiGet(["names", "settings", "teams"], (e, results) => {
-            console.log(results);
+        AsyncStorage.multiGet(["namez", "settings", "teams"], (e, results) => {
             if (results[0][1] && results[1][1] && results[2][1]) {
                 const loadedState = {
                     names: JSON.parse(results[0][1]),

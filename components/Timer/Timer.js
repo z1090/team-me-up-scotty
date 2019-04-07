@@ -8,7 +8,7 @@ export class Timer extends React.Component {
         super(props);
 
         this.state = {
-            gameTimeMins: this.props.gameTime * 60,
+            gameTimeMins: this.props.gameTime < 60 ? this.props.gameTime * 60 : 3599,
         };
 
         this.endGame = this.endGame.bind(this);

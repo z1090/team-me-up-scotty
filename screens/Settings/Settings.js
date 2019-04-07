@@ -57,7 +57,7 @@ export default class App extends React.Component {
         if (text !== "") {
             if (/^\d+$/.test(text)) {
                 this.setState({
-                    gameTime: text === "0" ? 1 : +text,
+                    gameTime: +text <= 0 ? 1 : +text > 60 ? 60 : +text,
                 });
             }
         } else {
@@ -178,7 +178,7 @@ export default class App extends React.Component {
                             </View>
                         ) : null}
                         <View style={styles.settingRow}>
-                            <BoldText style={styles.settingName}>Minutes per Match: </BoldText>
+                            <BoldText style={styles.settingName}>Mins per Match (max 60): </BoldText>
                             {isIOS ? (
                                 <TextInput
                                     style={styles.textInput}
@@ -189,7 +189,7 @@ export default class App extends React.Component {
                                     maxLength={2}
                                     defaultValue={this.state.gameTime === 0 ? "" : `${this.state.gameTime}`}
                                     onTextChange={(text) => {
-                                        this.setState({ gameTime: +text });
+                                        this.setState({ gameTime: +text <= 0 ? 1 : +text > 60 ? 60 : +text });
                                     }}
                                 />
                             ) : (
