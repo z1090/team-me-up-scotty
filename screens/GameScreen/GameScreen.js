@@ -1,13 +1,12 @@
 import React from "react";
-import { StyleSheet, View, ImageBackground } from "react-native";
+import { View, ImageBackground } from "react-native";
 
 import Timer from "../../components/Timer";
 import Button from "../../components/Button";
 import HeaderIcon from "../../components/HeaderIcon";
+import styles from "./styles";
 
-import { HEADER_SIZE } from "../../utilities/isIphoneX";
-
-import BackgroundImg from "../../assets/game-background.jpg";
+import gameBackgroundImg from "../../assets/images/game-background.jpg";
 
 export default class GameScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -53,9 +52,8 @@ export default class GameScreen extends React.Component {
     }
 
     render() {
-        console.log(this.props.gameTime);
         return (
-            <ImageBackground source={BackgroundImg} style={styles.background}>
+            <ImageBackground source={gameBackgroundImg} style={styles.background}>
                 <View style={styles.container}>
                     {this.state.reset ? null : <Timer />}
                     <Button style={{ backgroundColor: this.props.gamePaused ? "#388E3C" : "#B31A1A" }} onPress={this.handlePaused}>
@@ -71,39 +69,3 @@ export default class GameScreen extends React.Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        // backgroundColor: "yellow",
-        marginTop: HEADER_SIZE + 50,
-    },
-    innerContainer: {
-        // flex: 1,
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        marginTop: 200,
-        backgroundColor: "blue",
-    },
-    background: {
-        width: "100%",
-        flex: 1,
-    },
-    btn: {
-        alignItems: "center",
-        justifyContent: "center",
-        width: 200,
-        height: 50,
-        borderRadius: 8,
-        backgroundColor: "#388E3C",
-        marginVertical: 20,
-    },
-    btnText: {
-        fontSize: 18,
-        color: "#FFF",
-    },
-});
