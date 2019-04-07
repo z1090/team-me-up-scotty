@@ -1,6 +1,6 @@
 # Team-me-up-scotty
 
-Team Me Up (Scotty) is a mobile app that randomly picks 5-a-side football teams from a list of names. It’s a handy tool to have if teams are selected just before play starts, based on who turns up on the day, rather than a more organised setup where teams are selected in advance. You can create up to 9 teams and enter as many participants as you'd like (3+), so it's not strictly 5-a-side, which is useful if only 9 players turn up! Or if 14 turned up, you could choose either 7-a-side or 2 teams of 5 and one 4.
+Team Me Up (Scotty) is a mobile app that randomly picks 5-a-side football teams from a list of names. It’s a handy tool to have if teams are selected just before play starts, based on who turns up on the day, rather than a more organised setup where teams are selected in advance. You can create up to 9 teams and enter as many participants as you'd like (3+), so it's not strictly 5-a-side, which is useful if only 9 players turn up! Or if 14 turned up, you could choose either 7-a-side or 2 teams of 5 and one of 4.
 
 ## Github Page
 
