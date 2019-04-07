@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View, ImageBackground, TouchableHighlight } from "react-native";
+import { StyleSheet, View, ImageBackground } from "react-native";
 
 import Timer from "../../components/Timer";
 import Button from "../../components/Button";
